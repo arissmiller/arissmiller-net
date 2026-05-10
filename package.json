@@ -1,0 +1,15 @@
+{
+  "name": "arissmiller-net",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite preview --host 0.0.0.0 --port ${PORT:-4173}"
+  },
+  "devDependencies": {
+    "vite": "^6.4.2"
+  }
+}
