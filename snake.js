@@ -238,6 +238,10 @@ function initThemeEditor() {
 }
 
 function keyDownHandler(e) {
+  if (e.key == "Enter" && !gameRunning) {
+    startGame();
+    return;
+  }
   if (e.key == "Right" || e.key == "ArrowRight" || e.key == "d" || e.key == "D") {
     nextDirection = "Right";
   }
@@ -627,7 +631,7 @@ function drawGameOverOverlay() {
   ctx.font = "28px 'Press Start 2P'";
   ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 28);
   ctx.font = "12px 'Press Start 2P'";
-  ctx.fillText("CLICK RESTART RUN", canvas.width / 2, canvas.height / 2 + 18);
+  ctx.fillText("PRESS ENTER TO RESTART", canvas.width / 2, canvas.height / 2 + 18);
 }
 
 function render(now, alpha) {
