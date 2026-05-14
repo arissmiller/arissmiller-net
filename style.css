@@ -437,6 +437,19 @@ a {
   transform: translateY(0);
 }
 
+@keyframes snake-party-hue {
+  to { filter: hue-rotate(360deg); }
+}
+
+.snake-button--party {
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #a855f7, #ec4899, #f97316);
+}
+
+.snake-button--party.is-active {
+  animation: snake-party-hue 1.2s linear infinite;
+}
+
 .snake-help-text {
   margin: 0 0 0.7rem;
   color: #cbd5e1;

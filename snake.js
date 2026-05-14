@@ -26,9 +26,15 @@ let nextDirection = "Right";
 let gameRunning = false;
 let lastTickTime = 0;
 
+let partyMode = false;
+let savedSnakeColor = snakeColor;
+let savedFoodColor = foodColor;
+let partyGridHue = 0;
+
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("highScore");
 const restartButton = document.getElementById("restartButton");
+const partyButton = document.getElementById("partyButton");
 const themeInputs = {
   snake: document.getElementById("snakeColorPicker"),
   food: document.getElementById("foodColorPicker"),
@@ -55,10 +61,45 @@ document.addEventListener("keydown", keyDownHandler, false);
 if (restartButton) {
   restartButton.addEventListener("click", startGame);
 }
+if (partyButton) {
+  partyButton.addEventListener("click", togglePartyMode);
+}
 
 initThemeEditor();
 startGame();
 requestAnimationFrame(gameLoop);
+
+function hslToHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const channel = (n) => {
+    const k = (n + h / 30) % 12;
+    return Math.round((l - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1)))) * 255);
+  };
+  return "#" + [channel(0), channel(8), channel(4)].map((v) => v.toString(16).padStart(2, "0")).join("");
+}
+
+function applyPartyColors(now) {
+  const hue = (now / 10) % 360;
+  snakeColor = hslToHex(hue, 100, 55);
+  foodColor = hslToHex((hue + 120) % 360, 100, 60);
+  partyGridHue = (hue + 240) % 360;
+}
+
+function togglePartyMode() {
+  partyMode = !partyMode;
+  if (partyButton) {
+    partyButton.classList.toggle("is-active", partyMode);
+  }
+  if (!partyMode) {
+    snakeColor = savedSnakeColor;
+    foodColor = savedFoodColor;
+  } else {
+    savedSnakeColor = snakeColor;
+    savedFoodColor = foodColor;
+  }
+}
 
 function cloneSnake(sourceSnake) {
   return sourceSnake.map(function (segment) {
@@ -391,7 +432,16 @@ function drawTronGrid() {
   ctx.fillStyle = backgroundColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const gridStyles = getGridLineStyles(backgroundColor);
+  let gridStyles;
+  if (partyMode) {
+    const rgb = hexToRgb(hslToHex(partyGridHue, 80, 60));
+    gridStyles = {
+      minor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.32)`,
+      major: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.58)`,
+    };
+  } else {
+    gridStyles = getGridLineStyles(backgroundColor);
+  }
 
   // Static board-aligned grid so the background represents the playable cells.
   ctx.strokeStyle = gridStyles.minor;
@@ -515,35 +565,43 @@ function drawSnakeFace(alpha) {
   const head = getInterpolatedHead(alpha);
   const eyeColor = getSnakeEyeColor();
   const s = squareSize;
-  const eyeRadius = Math.max(1, s * 0.095);
-  const eyeX = -s * 0.08;
-  const eyeOffsetY = s * 0.18;
 
   ctx.save();
   ctx.translate(head.x + s / 2, head.y + s / 2);
   ctx.rotate(getDirectionAngle());
-
-  // Eyes are shifted slightly backward to leave room for a smile near the front.
-  ctx.fillStyle = eyeColor;
   ctx.shadowBlur = 0;
-  ctx.beginPath();
-  ctx.arc(eyeX, -eyeOffsetY, eyeRadius, 0, 2 * Math.PI);
-  ctx.fill();
-  ctx.closePath();
 
-  ctx.beginPath();
-  ctx.arc(eyeX, eyeOffsetY, eyeRadius, 0, 2 * Math.PI);
-  ctx.fill();
-  ctx.closePath();
+  const eyeX = 0;
+  const eyeOffsetY = s * 0.26;
+  const irisRx = s * 0.155;
+  const irisRy = s * 0.115;
 
-  // Right-facing half-ellipse smile, rotated with the head direction.
-  ctx.strokeStyle = eyeColor;
-  ctx.lineWidth = Math.max(1.2, s * 0.07);
+  const isDarkIris = eyeColor.startsWith("rgba(10");
+  const markColor = isDarkIris ? "rgba(210, 230, 255, 0.42)" : "rgba(8, 4, 18, 0.45)";
+
+  // Solid oval eyes
+  ctx.fillStyle = eyeColor;
+  ctx.beginPath();
+  ctx.ellipse(eyeX, -eyeOffsetY, irisRx, irisRy, 0, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(eyeX, eyeOffsetY, irisRx, irisRy, 0, 0, 2 * Math.PI);
+  ctx.fill();
+
+  // Two nostril slits near the snout
+  ctx.strokeStyle = markColor;
+  ctx.lineWidth = Math.max(1, s * 0.055);
   ctx.lineCap = "round";
+  const slitX = s * 0.3;
+  const slitHalf = s * 0.06;
+  const slitOffsetY = s * 0.1;
+
   ctx.beginPath();
-  ctx.ellipse(s * 0.17, 0, s * 0.15, s * 0.12, 0, -Math.PI / 2, Math.PI / 2);
+  ctx.moveTo(slitX, -slitOffsetY - slitHalf);
+  ctx.lineTo(slitX, -slitOffsetY + slitHalf);
+  ctx.moveTo(slitX, slitOffsetY - slitHalf);
+  ctx.lineTo(slitX, slitOffsetY + slitHalf);
   ctx.stroke();
-  ctx.closePath();
 
   ctx.restore();
 }
@@ -579,15 +637,16 @@ function drawSnakeTongue(now, alpha) {
 
   const centerX = head.x + squareSize / 2;
   const centerY = head.y + squareSize / 2;
-  const mouthX = centerX + dir.x * squareSize * 0.34;
-  const mouthY = centerY + dir.y * squareSize * 0.34;
-  const tongueLength = squareSize * (0.1 + 0.42 * flick);
-  const tipX = mouthX + dir.x * tongueLength;
-  const tipY = mouthY + dir.y * tongueLength;
-  const forkSize = squareSize * (0.05 + 0.08 * flick);
+  const mouthX = centerX + dir.x * squareSize * 0.37;
+  const mouthY = centerY + dir.y * squareSize * 0.37;
+  const stemLength = squareSize * (0.1 + 0.48 * flick);
+  const tipX = mouthX + dir.x * stemLength;
+  const tipY = mouthY + dir.y * stemLength;
+  const forkForward = squareSize * 0.12 * flick;
+  const forkSide = squareSize * (0.06 + 0.14 * flick);
 
-  ctx.strokeStyle = "rgba(255, 165, 170, 0.92)";
-  ctx.lineWidth = Math.max(1.1, squareSize * 0.06);
+  ctx.strokeStyle = "rgba(255, 148, 162, 0.95)";
+  ctx.lineWidth = Math.max(1, squareSize * 0.05);
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.shadowBlur = 0;
@@ -599,9 +658,9 @@ function drawSnakeTongue(now, alpha) {
 
   ctx.beginPath();
   ctx.moveTo(tipX, tipY);
-  ctx.lineTo(tipX + perp.x * forkSize, tipY + perp.y * forkSize);
+  ctx.lineTo(tipX + dir.x * forkForward + perp.x * forkSide, tipY + dir.y * forkForward + perp.y * forkSide);
   ctx.moveTo(tipX, tipY);
-  ctx.lineTo(tipX - perp.x * forkSize, tipY - perp.y * forkSize);
+  ctx.lineTo(tipX + dir.x * forkForward - perp.x * forkSide, tipY + dir.y * forkForward - perp.y * forkSide);
   ctx.stroke();
 }
 
@@ -635,6 +694,9 @@ function drawGameOverOverlay() {
 }
 
 function render(now, alpha) {
+  if (partyMode) {
+    applyPartyColors(now);
+  }
   drawTronGrid();
   drawSnake(alpha);
   drawSnakeFace(alpha);
