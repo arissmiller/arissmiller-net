@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake | Armen Rissmiller</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee&family=Chakra+Petch:wght@400;500;600;700&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="snake-game-body">
+    <main class="container snake-page-shell">
+      <header class="snake-hero">
+        <a class="snake-back-link" href="/index.html">Back to projects</a>
+        <p class="snake-kicker">Arcade Prototype</p>
+        <h1 class="snake-title">Snake</h1>
+        <p class="snake-subtitle">
+          One-button focus, fast rounds, and old-school canvas gameplay.
+        </p>
+      </header>
+
+      <section class="snake-layout" aria-label="Snake game area">
+        <div class="snake-stage">
+          <div class="snake-stage-badges">
+            <span class="snake-badge">Canvas Game</span>
+            <span class="snake-badge snake-badge-live">Live Prototype</span>
+          </div>
+          <div id="snakeScreen" class="snake-screen">
+            <canvas
+              id="snakeCanvas"
+              width="600"
+              height="600"
+              aria-label="Snake game board"
+            ></canvas>
+            <div class="snake-screen-crt" aria-hidden="true"></div>
+            <div class="snake-screen-glass" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <aside class="snake-sidebar">
+          <section class="snake-panel">
+            <h2 class="snake-panel-title">Game Setup</h2>
+            <p class="snake-help-text">Pick each color in the game.</p>
+            <div class="snake-theme-editor">
+              <label class="snake-theme-row" for="snakeColorPicker">
+                <span>Snake</span>
+                <input id="snakeColorPicker" type="color" value="#df0101" />
+              </label>
+              <label class="snake-theme-row" for="foodColorPicker">
+                <span>Food</span>
+                <input id="foodColorPicker" type="color" value="#facc15" />
+              </label>
+              <label class="snake-theme-row" for="backgroundColorPicker">
+                <span>Background</span>
+                <input id="backgroundColorPicker" type="color" value="#1c1c1c" />
+              </label>
+              <div class="snake-theme-row snake-difficulty-row">
+                <span>Difficulty</span>
+                <div class="snake-difficulty-toggle" role="group" aria-label="Difficulty">
+                  <button
+                    id="difficultyEasy"
+                    class="snake-difficulty-button"
+                    data-difficulty="easy"
+                    type="button"
+                    aria-pressed="false"
+                  >
+                    Easy
+                  </button>
+                  <button
+                    id="difficultyMedium"
+                    class="snake-difficulty-button is-active"
+                    data-difficulty="medium"
+                    type="button"
+                    aria-pressed="true"
+                  >
+                    Medium
+                  </button>
+                  <button
+                    id="difficultyHard"
+                    class="snake-difficulty-button"
+                    data-difficulty="hard"
+                    type="button"
+                    aria-pressed="false"
+                  >
+                    Hard
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="snake-stats">
+              <p id="score" class="snake-score">Score: 0</p>
+              <p id="highScore" class="snake-score">High score: 0</p>
+            </div>
+            <button id="restartButton" class="snake-button" type="button">
+              Restart Run
+            </button>
+          </section>
+
+          <section class="snake-panel">
+            <h2 class="snake-panel-title">How To Play</h2>
+            <p class="snake-help-text">Use arrow keys to move. Grab food and avoid walls.</p>
+            <div class="snake-keys" aria-hidden="true">
+              <span>↑</span>
+              <span>←</span>
+              <span>↓</span>
+              <span>→</span>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="/snake.js"></script>
+  </body>
+</html>

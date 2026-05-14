@@ -9,14 +9,52 @@
   <body>
     <main class="container">
       <h1>Armen Rissmiller</h1>
-
-      <section>
+      <p>Welcome to my portfolio!</p>
+      <section class="projects">
         <h2>Projects</h2>
-        <ul>
-          <li>Project One</li>
-          <li>Project Two</li>
-          <li>Project Three</li>
-        </ul>
+        <p class="projects-note">
+          NOTE: All projects shown here are prototypes and are still in early development!
+        </p>
+        <div class="project-grid">
+          <article class="project-card">
+            <img
+              class="project-image"
+              src="/images/orbital-combat.jpeg"
+              alt="Screenshot of the Orbital Combat prototype"
+            />
+            <h3>Orbital Combat Prototype</h3>
+            <p>A video game that combines physics-based flying with tactical combat.</p>
+          </article>
+
+          <article class="project-card">
+            <a
+              class="project-card-link"
+              href="https://algotrader.arissmiller.net"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                class="project-image"
+                src="/images/trading-algorithm.jpeg"
+                alt="Visualization from the stock trading algorithm project"
+              />
+              <h3>Stock Trading Algorithm</h3>
+              <p>A program that analyzes stock market data and makes trading decisions.</p>
+            </a>
+          </article>
+
+          <article class="project-card">
+            <a class="project-card-link" href="/snake.html">
+              <img
+                class="project-image"
+                src="/images/snake-cover.png"
+                alt="Stylized Snake logo with a grid-based snake path and food dot"
+              />
+              <h3>Snake</h3>
+              <p>Classic Snake built with JavaScript and an HTML canvas.</p>
+            </a>
+          </article>
+        </div>
       </section>
 
       <p>
