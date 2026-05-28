@@ -1,5 +1,5 @@
 const imageModules = import.meta.glob(
-  "./paint-swirls/*.{png,jpg,jpeg,webp,avif,gif,PNG,JPG,JPEG,WEBP,AVIF,GIF}",
+  "./assets/images/paint-swirls/*.{png,jpg,jpeg,webp,avif,gif,PNG,JPG,JPEG,WEBP,AVIF,GIF}",
   { eager: true, import: "default" },
 );
 
