@@ -2,7 +2,6 @@ import { createServer } from "node:http";
 import { createReadStream, existsSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import path from "node:path";
-import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
@@ -92,28 +91,40 @@ async function proxyRequest(req, res) {
       headers,
       body: req.method === "GET" || req.method === "HEAD" ? undefined : req,
       duplex: req.method === "GET" || req.method === "HEAD" ? undefined : "half",
-      redirect: "manual",
     });
 
     const responseHeaders = {};
     upstreamResponse.headers.forEach((value, key) => {
-      if (key.toLowerCase() === "content-length") {
+      const lowerKey = key.toLowerCase();
+      if (lowerKey === "transfer-encoding") {
         return;
       }
       responseHeaders[key] = value;
     });
 
-    res.writeHead(upstreamResponse.status, responseHeaders);
-
-    if (!upstreamResponse.body || req.method === "HEAD") {
+    if (req.method === "HEAD") {
+      res.writeHead(upstreamResponse.status, responseHeaders);
       res.end();
       return;
     }
 
-    await pipeline(Readable.fromWeb(upstreamResponse.body), res);
+    const responseBuffer = Buffer.from(await upstreamResponse.arrayBuffer());
+    console.log(
+      `[sea-proxy] ${req.method} ${req.url} -> ${targetUrl} status=${upstreamResponse.status} bytes=${responseBuffer.length}`,
+    );
+    responseHeaders["content-length"] = String(responseBuffer.length);
+    res.writeHead(upstreamResponse.status, responseHeaders);
+    res.end(responseBuffer);
   } catch (error) {
-    res.writeHead(502, { "content-type": "text/plain; charset=utf-8" });
-    res.end(`Failed to proxy Sea of Simulation request: ${error.message}`);
+    console.error(`[sea-proxy] ${req.method} ${req.url} failed:`, error);
+    if (!res.headersSent) {
+      res.writeHead(502, { "content-type": "text/plain; charset=utf-8" });
+      res.end(`Failed to proxy Sea of Simulation request: ${error.message}`);
+      return;
+    }
+    if (!res.writableEnded) {
+      res.destroy(error);
+    }
   }
 }
 
