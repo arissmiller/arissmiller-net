@@ -31,13 +31,28 @@ function getContentType(filePath) {
   return CONTENT_TYPES.get(path.extname(filePath).toLowerCase()) ?? "application/octet-stream";
 }
 
+function normalizeOriginUrl(value) {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return null;
+  }
+
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  return `https://${trimmedValue}`;
+}
+
 function buildTargetUrl(requestUrl) {
-  if (!SEA_OF_SIMULATION_ORIGIN) {
+  const normalizedOrigin = normalizeOriginUrl(SEA_OF_SIMULATION_ORIGIN);
+
+  if (!normalizedOrigin) {
     return null;
   }
 
   const incomingUrl = new URL(requestUrl, "http://127.0.0.1");
-  const upstreamBase = new URL(SEA_OF_SIMULATION_ORIGIN);
+  const upstreamBase = new URL(normalizedOrigin);
   const upstreamPath = incomingUrl.pathname.replace(PROXY_PREFIX, "") || "/";
 
   upstreamBase.pathname = `${upstreamBase.pathname.replace(/\/$/, "")}${upstreamPath}`;

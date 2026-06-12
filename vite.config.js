@@ -1,7 +1,24 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
-const seaOfSimulationOrigin = process.env.SEA_OF_SIMULATION_ORIGIN;
+function normalizeOriginUrl(value) {
+  if (!value) {
+    return undefined;
+  }
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) {
+    return undefined;
+  }
+
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  return `https://${trimmedValue}`;
+}
+
+const seaOfSimulationOrigin = normalizeOriginUrl(process.env.SEA_OF_SIMULATION_ORIGIN);
 
 export default defineConfig({
   build: {
