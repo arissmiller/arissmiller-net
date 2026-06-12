@@ -1,6 +1,8 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
+const seaOfSimulationOrigin = process.env.SEA_OF_SIMULATION_ORIGIN;
+
 export default defineConfig({
   build: {
     rollupOptions: {
@@ -11,6 +13,17 @@ export default defineConfig({
       },
     },
   },
+  server: seaOfSimulationOrigin
+    ? {
+        proxy: {
+          "/sea-of-simulation": {
+            target: seaOfSimulationOrigin,
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/sea-of-simulation/, "") || "/",
+          },
+        },
+      }
+    : undefined,
   preview: {
     allowedHosts: ["arissmiller.net", "arissmiller-net-production.up.railway.app"],
   },
