@@ -102,11 +102,23 @@ function createTrace(random, width, height, grid, palette) {
 }
 
 function createChip(random, width, height, grid, palette) {
-  const chipWidth = grid * randomInteger(random, 3, 7);
-  const chipHeight = grid * randomInteger(random, 2, 5);
+  const maximumColumns = Math.max(
+    1,
+    Math.min(7, Math.floor(width / grid) - 2),
+  );
+  const maximumRows = Math.max(
+    1,
+    Math.min(5, Math.floor(height / grid) - 2),
+  );
+  const chipWidth =
+    grid * randomInteger(random, Math.min(3, maximumColumns), maximumColumns);
+  const chipHeight =
+    grid * randomInteger(random, Math.min(2, maximumRows), maximumRows);
+  const maximumX = Math.max(grid, width - chipWidth - grid);
+  const maximumY = Math.max(grid, height - chipHeight - grid);
   return {
-    x: Math.round(randomBetween(random, grid, width - chipWidth - grid) / grid) * grid,
-    y: Math.round(randomBetween(random, grid, height - chipHeight - grid) / grid) * grid,
+    x: Math.round(randomBetween(random, grid, maximumX) / grid) * grid,
+    y: Math.round(randomBetween(random, grid, maximumY) / grid) * grid,
     width: chipWidth,
     height: chipHeight,
     color: choose(random, palette),
@@ -135,14 +147,14 @@ function pointAlongTrace(trace, distance) {
   return trace.points.at(-1);
 }
 
-function drawTrace(context, trace) {
+function drawTrace(context, trace, glow) {
   context.beginPath();
   trace.points.forEach((point, index) => {
     if (index === 0) context.moveTo(point.x, point.y);
     else context.lineTo(point.x, point.y);
   });
-  context.strokeStyle = hexToRgba(trace.color, 0.2);
-  context.lineWidth = trace.width + 3;
+  context.strokeStyle = hexToRgba(trace.color, 0.12 + glow * 0.08);
+  context.lineWidth = trace.width + 1 + glow * 2;
   context.stroke();
   context.strokeStyle = hexToRgba(trace.color, 0.52);
   context.lineWidth = trace.width;
@@ -160,10 +172,10 @@ function drawTrace(context, trace) {
   });
 }
 
-function drawChip(context, chip) {
+function drawChip(context, chip, glow) {
   context.save();
   context.shadowColor = hexToRgba(chip.color, 0.24);
-  context.shadowBlur = 10;
+  context.shadowBlur = glow * 10;
   context.fillStyle = "rgba(7, 10, 15, 0.94)";
   context.strokeStyle = hexToRgba(chip.color, 0.48);
   context.lineWidth = 0.8;
@@ -199,9 +211,18 @@ function drawChip(context, chip) {
   context.restore();
 }
 
-function drawBoard(context, width, height, traces, chips, grid) {
+function drawBoard(
+  context,
+  width,
+  height,
+  traces,
+  chips,
+  grid,
+  background,
+  glow,
+) {
   context.clearRect(0, 0, width, height);
-  context.fillStyle = "#07090d";
+  context.fillStyle = background;
   context.fillRect(0, 0, width, height);
 
   context.fillStyle = "rgba(184, 205, 229, 0.07)";
@@ -211,8 +232,8 @@ function drawBoard(context, width, height, traces, chips, grid) {
     }
   }
 
-  traces.forEach((trace) => drawTrace(context, trace));
-  chips.forEach((chip) => drawChip(context, chip));
+  traces.forEach((trace) => drawTrace(context, trace, glow));
+  chips.forEach((chip) => drawChip(context, chip, glow));
 }
 
 export function mountCircuitBackground(canvas, options = {}) {
@@ -221,8 +242,18 @@ export function mountCircuitBackground(canvas, options = {}) {
   const context = canvas.getContext("2d", { alpha: false });
   if (!context) return () => {};
 
+  const numberOption = (name, fallback) => {
+    const value = Number(options[name]);
+    return options[name] !== undefined && Number.isFinite(value)
+      ? value
+      : fallback;
+  };
   const palette = options.palette ?? DEFAULT_PALETTE;
   const seed = options.seed ?? "interesting-things";
+  const background = options.background ?? "#07090d";
+  const animationSpeed = Math.max(0.1, numberOption("animationSpeed", 1));
+  const glow = Math.max(0, Math.min(2, numberOption("glow", 1)));
+  const animated = options.animated !== false;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const staticLayer = document.createElement("canvas");
   const staticContext = staticLayer.getContext("2d", { alpha: false });
@@ -244,7 +275,7 @@ export function mountCircuitBackground(canvas, options = {}) {
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.drawImage(staticLayer, 0, 0);
 
-    if (!reducedMotion.matches) {
+    if (!reducedMotion.matches && animated) {
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       context.globalCompositeOperation = "screen";
 
@@ -255,7 +286,7 @@ export function mountCircuitBackground(canvas, options = {}) {
         );
         context.save();
         context.shadowColor = pulse.trace.color;
-        context.shadowBlur = 14;
+        context.shadowBlur = 7 + glow * 7;
         context.fillStyle = hexToRgba(pulse.trace.color, 0.88);
         context.beginPath();
         context.arc(point.x, point.y, 1.8, 0, Math.PI * 2);
@@ -268,7 +299,7 @@ export function mountCircuitBackground(canvas, options = {}) {
 
     previousTime = time;
 
-    if (!document.hidden && !reducedMotion.matches) {
+    if (!document.hidden && !reducedMotion.matches && animated) {
       frame = window.requestAnimationFrame(drawFrame);
     }
   };
@@ -277,7 +308,10 @@ export function mountCircuitBackground(canvas, options = {}) {
     stopAnimation();
     width = window.innerWidth;
     height = window.innerHeight;
-    pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    pixelRatio = Math.min(
+      window.devicePixelRatio || 1,
+      Math.max(1, numberOption("pixelRatioLimit", 2)),
+    );
 
     canvas.width = Math.max(1, Math.round(width * pixelRatio));
     canvas.height = Math.max(1, Math.round(height * pixelRatio));
@@ -286,11 +320,32 @@ export function mountCircuitBackground(canvas, options = {}) {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
 
-    const grid = width < 700 ? 24 : 30;
+    const grid = Math.max(
+      16,
+      Math.min(64, numberOption("gridSize", width < 700 ? 24 : 30)),
+    );
     const area = width * height;
     const random = createRandom(`${seed}:${Math.round(width / grid)}:${Math.round(height / grid)}`);
-    const traceCount = Math.max(38, Math.min(110, Math.round(area / 18000)));
-    const chipCount = Math.max(5, Math.min(16, Math.round(area / 110000)));
+    const traceCount = Math.max(
+      8,
+      Math.min(
+        180,
+        numberOption(
+          "traceCount",
+          Math.max(38, Math.min(110, Math.round(area / 18000))),
+        ),
+      ),
+    );
+    const chipCount = Math.max(
+      0,
+      Math.min(
+        30,
+        numberOption(
+          "chipCount",
+          Math.max(5, Math.min(16, Math.round(area / 110000))),
+        ),
+      ),
+    );
 
     traces = Array.from({ length: traceCount }, () =>
       createTrace(random, width, height, grid, palette),
@@ -298,17 +353,35 @@ export function mountCircuitBackground(canvas, options = {}) {
     const chips = Array.from({ length: chipCount }, () =>
       createChip(random, width, height, grid, palette),
     );
+    const requestedPulseCount = Math.max(
+      0,
+      Math.min(24, numberOption("pulseCount", 12)),
+    );
+    const pulseStep =
+      requestedPulseCount === 0
+        ? Number.POSITIVE_INFINITY
+        : Math.max(1, Math.floor(traceCount / requestedPulseCount));
     pulses = traces
-      .filter((_, index) => index % Math.max(5, Math.floor(traceCount / 10)) === 0)
-      .slice(0, 12)
+      .filter((_, index) => index % pulseStep === 0)
+      .slice(0, requestedPulseCount)
       .map((trace) => ({
         trace,
         offset: randomBetween(random, 0, trace.totalLength),
-        speed: randomBetween(random, 0.018, 0.045),
+        speed:
+          randomBetween(random, 0.018, 0.045) * animationSpeed,
       }));
 
     staticContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    drawBoard(staticContext, width, height, traces, chips, grid);
+    drawBoard(
+      staticContext,
+      width,
+      height,
+      traces,
+      chips,
+      grid,
+      background,
+      glow,
+    );
     drawFrame(previousTime);
   };
 
@@ -326,7 +399,7 @@ export function mountCircuitBackground(canvas, options = {}) {
   };
 
   const handleMotionPreference = () => {
-    if (reducedMotion.matches) stopAnimation();
+    if (reducedMotion.matches || !animated) stopAnimation();
     drawFrame(previousTime);
   };
 

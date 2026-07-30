@@ -249,6 +249,59 @@
         object-fit: cover;
       }
 
+      .project-card-circuit-preview {
+        background-color: #07090d;
+        background-image:
+          linear-gradient(135deg, transparent 47%, rgba(0, 229, 255, 0.42) 48% 49%, transparent 50%),
+          linear-gradient(45deg, transparent 47%, rgba(255, 99, 216, 0.32) 48% 49%, transparent 50%),
+          radial-gradient(circle, rgba(184, 255, 61, 0.55) 0 1px, transparent 2px);
+        background-position:
+          0 0,
+          0 0,
+          14px 14px;
+        background-size:
+          92px 92px,
+          92px 92px,
+          28px 28px;
+      }
+
+      .circuit-preview-chip {
+        position: relative;
+        z-index: 1;
+        width: 30%;
+        aspect-ratio: 2 / 1.15;
+        border: 1px solid rgba(255, 191, 63, 0.82);
+        background: #090c12;
+        box-shadow:
+          0 0 1.2rem rgba(255, 191, 63, 0.24),
+          -4.5rem -2.5rem 0 -1.2rem #090c12,
+          -4.5rem -2.5rem 0 -1.15rem rgba(0, 229, 255, 0.8),
+          5rem 2.8rem 0 -1.2rem #090c12,
+          5rem 2.8rem 0 -1.15rem rgba(255, 99, 216, 0.8);
+      }
+
+      .circuit-preview-chip::before,
+      .circuit-preview-chip::after {
+        position: absolute;
+        left: -1.5rem;
+        width: calc(100% + 3rem);
+        height: 1px;
+        content: "";
+        background: repeating-linear-gradient(
+          90deg,
+          transparent 0 0.45rem,
+          rgba(255, 191, 63, 0.72) 0.45rem 0.8rem
+        );
+      }
+
+      .circuit-preview-chip::before {
+        top: -0.45rem;
+      }
+
+      .circuit-preview-chip::after {
+        bottom: -0.45rem;
+      }
+
       .project-card-body {
         display: grid;
         align-content: start;
@@ -406,6 +459,32 @@
           <p class="project-card-description">
             Customize an isometric grid and its animated routes, then copy the
             result.
+          </p>
+        </div>
+      </a>
+      <a
+        class="project-card"
+        href="/projects/circuits-like-freeways/"
+      >
+        <div
+          class="project-card-media project-card-media-filled project-card-circuit-preview"
+          aria-hidden="true"
+        >
+          <span class="circuit-preview-chip"></span>
+        </div>
+        <div class="project-card-body">
+          <h2 class="project-card-title">Circuits Like Freeways</h2>
+          <div class="project-card-labels">
+            <span class="project-card-label project-card-type-graphics">
+              Interactive Tool
+            </span>
+            <span class="project-card-label project-card-warning">
+              JavaScript required
+            </span>
+          </div>
+          <p class="project-card-description">
+            Route colorful signals through a procedural circuit landscape,
+            then export the complete HTML background.
           </p>
         </div>
       </a>

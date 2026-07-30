@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Design and export a colorful procedural circuit-board background."
+    />
+    <meta name="theme-color" content="#07090d" />
+    <title>Circuits Like Freeways — Armen Rissmiller</title>
+    <link rel="stylesheet" href="./generator.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <a class="back-link" href="/projects/" aria-label="Return to projects">
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M16.5 10H3.5M8.5 5 3.5 10l5 5" />
+        </svg>
+      </a>
+
+      <div class="heading-copy">
+        <p class="eyebrow">Procedural background instrument</p>
+        <h1>Circuits Like Freeways</h1>
+        <p class="intro">
+          Route colored signals through a dark synthetic landscape, then copy
+          the complete background as a standalone HTML document.
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button class="secondary-button" type="button" data-reset>Reset</button>
+        <button class="primary-button" type="button" data-copy>
+          Copy full HTML
+        </button>
+      </div>
+    </header>
+
+    <main class="generator-layout">
+      <aside class="control-panel" aria-labelledby="controls-title">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-kicker">Configuration</p>
+            <h2 id="controls-title">Controls</h2>
+          </div>
+          <span class="live-indicator"><span aria-hidden="true"></span>Live</span>
+        </div>
+
+        <form data-controls>
+          <fieldset>
+            <legend>Identity</legend>
+            <div class="seed-row">
+              <label>
+                <span>Seed</span>
+                <input name="seed" type="text" value="flynn-1982" />
+              </label>
+              <button class="icon-button" type="button" data-reseed>
+                New seed
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Palette</legend>
+            <div class="color-grid">
+              <label class="color-control">
+                <span>Background</span>
+                <input name="background" type="color" value="#07090d" />
+              </label>
+              <label class="color-control">
+                <span>Route 01</span>
+                <input name="color1" type="color" value="#00e5ff" />
+              </label>
+              <label class="color-control">
+                <span>Route 02</span>
+                <input name="color2" type="color" value="#ff63d8" />
+              </label>
+              <label class="color-control">
+                <span>Route 03</span>
+                <input name="color3" type="color" value="#ffbf3f" />
+              </label>
+              <label class="color-control">
+                <span>Route 04</span>
+                <input name="color4" type="color" value="#b8ff3d" />
+              </label>
+              <label class="color-control">
+                <span>Route 05</span>
+                <input name="color5" type="color" value="#b578ff" />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Board</legend>
+            <div class="range-list">
+              <label class="range-control">
+                <span>Grid spacing</span>
+                <span class="range-row">
+                  <input name="gridSize" type="range" min="16" max="56" value="30" />
+                  <output data-output="gridSize">30 px</output>
+                </span>
+              </label>
+              <label class="range-control">
+                <span>Trace count</span>
+                <span class="range-row">
+                  <input name="traceCount" type="range" min="16" max="160" value="88" />
+                  <output data-output="traceCount">88</output>
+                </span>
+              </label>
+              <label class="range-control">
+                <span>Chip count</span>
+                <span class="range-row">
+                  <input name="chipCount" type="range" min="0" max="24" value="10" />
+                  <output data-output="chipCount">10</output>
+                </span>
+              </label>
+              <label class="range-control">
+                <span>Glow</span>
+                <span class="range-row">
+                  <input name="glow" type="range" min="0" max="2" step="0.1" value="1" />
+                  <output data-output="glow">1.0×</output>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Signals</legend>
+            <div class="range-list">
+              <label class="range-control">
+                <span>Signal count</span>
+                <span class="range-row">
+                  <input name="pulseCount" type="range" min="0" max="20" value="10" />
+                  <output data-output="pulseCount">10</output>
+                </span>
+              </label>
+              <label class="range-control">
+                <span>Travel speed</span>
+                <span class="range-row">
+                  <input
+                    name="animationSpeed"
+                    type="range"
+                    min="0.25"
+                    max="2"
+                    step="0.05"
+                    value="1"
+                  />
+                  <output data-output="animationSpeed">1.00×</output>
+                </span>
+              </label>
+              <label class="toggle-control">
+                <span>
+                  <strong>Animate signals</strong>
+                  <small>Motion is disabled when the viewer requests reduced motion.</small>
+                </span>
+                <input name="animated" type="checkbox" checked />
+              </label>
+            </div>
+          </fieldset>
+        </form>
+      </aside>
+
+      <section class="output-column">
+        <section class="preview-panel" aria-labelledby="preview-title">
+          <div class="output-heading">
+            <div>
+              <p class="panel-kicker">Viewport</p>
+              <h2 id="preview-title">Live preview</h2>
+            </div>
+            <span class="preview-note">Responsive canvas</span>
+          </div>
+          <div class="preview-frame">
+            <iframe data-preview title="Generated circuit background preview"></iframe>
+          </div>
+        </section>
+
+        <section class="code-panel" aria-labelledby="code-title">
+          <div class="output-heading">
+            <div>
+              <p class="panel-kicker">Export</p>
+              <h2 id="code-title">Complete document</h2>
+            </div>
+            <button class="text-button" type="button" data-copy>Copy HTML</button>
+          </div>
+          <textarea data-code readonly spellcheck="false"></textarea>
+          <p class="copy-status" data-copy-status aria-live="polite">
+            The export has no dependencies or network requests.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./generator.js"></script>
+  </body>
+</html>

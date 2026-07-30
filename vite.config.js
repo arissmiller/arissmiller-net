@@ -473,6 +473,12 @@ export default defineConfig({
             import.meta.url,
           ),
         ),
+        circuitsLikeFreeways: fileURLToPath(
+          new URL(
+            "./projects/circuits-like-freeways/index.html",
+            import.meta.url,
+          ),
+        ),
         topographyGenerator: fileURLToPath(
           new URL(
             "./projects/topography-generator/index.html",
