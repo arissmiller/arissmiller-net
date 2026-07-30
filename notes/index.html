@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Notes, fragments, and works in progress by Armen Rissmiller."
+    />
+    <meta name="theme-color" content="#edfaff" />
+    <title>Notes — Armen Rissmiller</title>
+    <link rel="stylesheet" href="./notes.css" />
+  </head>
+  <body>
+    <svg
+      class="aero-field"
+      viewBox="0 0 1600 1000"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="aero-blue" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#0b79e8" stop-opacity=".08" />
+          <stop offset=".5" stop-color="#00baf2" stop-opacity=".52" />
+          <stop offset="1" stop-color="#005bc9" stop-opacity=".06" />
+        </linearGradient>
+        <linearGradient id="aero-glass" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".92" />
+          <stop offset=".48" stop-color="#b8f0ff" stop-opacity=".12" />
+          <stop offset="1" stop-color="#0089e8" stop-opacity=".36" />
+        </linearGradient>
+        <filter id="aero-blur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="9" />
+        </filter>
+      </defs>
+
+      <g class="aero-field-blur" filter="url(#aero-blur)">
+        <path d="M-80 870L510 90 690 160 180 930Z" fill="url(#aero-blue)" />
+        <path d="M1030-90L1690 300 1520 520 870 70Z" fill="url(#aero-glass)" />
+      </g>
+      <g class="aero-field-rails">
+        <path d="M-90 820L590-30" />
+        <path d="M70 1030L820-80" />
+        <path d="M860-100L1690 410" />
+        <path d="M1080-80L1640 260" />
+        <path d="M-50 950L520 760 930 820 1660 560" />
+      </g>
+      <g class="aero-field-shards">
+        <path d="M180 760L470 220 530 255Z" />
+        <path d="M305 900L700 190 760 120 465 820Z" />
+        <path d="M1100 70L1450 285 1315 265Z" />
+        <path d="M1220 170L1630 410 1420 340Z" />
+      </g>
+      <path class="aero-route aero-route-red" d="M-40 900L310 790 450 560" />
+      <path class="aero-route aero-route-amber" d="M1330 40L1455 140 1610 150" />
+    </svg>
+
+    <div class="aero-grain" aria-hidden="true"></div>
+
+    <main class="workspace">
+      <header class="workspace-header">
+        <a class="home-link" href="/" aria-label="Return to arissmiller.net">
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M2.5 9.2 10 3l7.5 6.2" />
+            <path d="M4.5 8.3v8.2h4v-5h3v5h4V8.3" />
+          </svg>
+        </a>
+
+        <div class="workspace-identity">
+          <p class="workspace-kicker">Arissmiller.net / Field notes</p>
+        </div>
+      </header>
+
+      <div class="workspace-body">
+        <aside class="file-browser" aria-labelledby="file-browser-title">
+          <div class="pane-header">
+            <div>
+              <p class="pane-eyebrow">Explorer</p>
+              <h2 id="file-browser-title">Files</h2>
+            </div>
+            <!-- NOTES_COUNT -->
+          </div>
+
+          <div class="file-root">
+            <div class="root-label">
+              <svg viewBox="0 0 20 16" aria-hidden="true">
+                <path d="M1 3.5h7l1.8-2H19v13H1z" />
+                <path d="M1 5.5h18" />
+              </svg>
+              <span>notes</span>
+            </div>
+            <ul class="file-list" aria-label="Markdown notes">
+              <!-- NOTES_TREE -->
+            </ul>
+          </div>
+
+          <footer class="browser-footer">
+            <span>MD</span>
+            <span>UTF—8</span>
+          </footer>
+        </aside>
+
+        <!-- NOTES_VIEWS -->
+      </div>
+    </main>
+
+  </body>
+</html>

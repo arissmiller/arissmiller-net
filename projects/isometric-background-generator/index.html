@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Design and export a customizable isometric line background with animated routes."
+    />
+    <title>Isometric Background Generator — Armen Rissmiller</title>
+    <link rel="stylesheet" href="./generator.css" />
+  </head>
+
+  <body>
+    <header class="page-header">
+      <a class="back-link" href="/projects/">Projects</a>
+      <div class="heading-copy">
+        <p class="eyebrow">Interactive tool</p>
+        <h1>Isometric Background Generator</h1>
+        <p class="intro">
+          Tune the grid and its animated routes, then copy a complete,
+          dependency-free HTML document.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="secondary-button" type="button" data-reset>
+          Reset
+        </button>
+        <button class="primary-button" type="button" data-copy>
+          Copy full HTML
+        </button>
+      </div>
+    </header>
+
+    <main class="generator-layout">
+      <aside class="control-panel" aria-labelledby="controls-title">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-kicker">Configuration</p>
+            <h2 id="controls-title">Controls</h2>
+          </div>
+          <span class="live-indicator">
+            <span aria-hidden="true"></span>
+            Live
+          </span>
+        </div>
+
+        <form data-controls>
+          <fieldset>
+            <legend>Palette</legend>
+            <div class="color-grid">
+              <label class="color-control">
+                <span>Background</span>
+                <span class="color-input-shell">
+                  <input
+                    type="color"
+                    name="backgroundColor"
+                    value="#ffffff"
+                  />
+                  <output data-color-output="backgroundColor">#ffffff</output>
+                </span>
+              </label>
+              <label class="color-control">
+                <span>Coarse grid</span>
+                <span class="color-input-shell">
+                  <input
+                    type="color"
+                    name="coarseColor"
+                    value="#9dcde5"
+                  />
+                  <output data-color-output="coarseColor">#9dcde5</output>
+                </span>
+              </label>
+              <label class="color-control">
+                <span>Fine grid</span>
+                <span class="color-input-shell">
+                  <input
+                    type="color"
+                    name="fineColor"
+                    value="#d0e8f4"
+                  />
+                  <output data-color-output="fineColor">#d0e8f4</output>
+                </span>
+              </label>
+              <label class="color-control" data-fixed-color-control>
+                <span>Fixed route</span>
+                <span class="color-input-shell">
+                  <input
+                    type="color"
+                    name="routeColor"
+                    value="#ff3b82"
+                  />
+                  <output data-color-output="routeColor">#ff3b82</output>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Line treatment</legend>
+            <div class="select-grid">
+              <label>
+                <span>Grid style</span>
+                <select name="gridStyle">
+                  <option value="solid" selected>Solid</option>
+                  <option value="dashed">Dashed</option>
+                  <option value="dotted">Dotted</option>
+                </select>
+              </label>
+              <label>
+                <span>Route style</span>
+                <select name="routeStyle">
+                  <option value="solid">Solid</option>
+                  <option value="dashed" selected>Dashed</option>
+                  <option value="dotted">Dotted</option>
+                </select>
+              </label>
+              <label>
+                <span>Route colors</span>
+                <select name="routeColorMode">
+                  <option value="random" selected>Random hues</option>
+                  <option value="rainbow">Rainbow shift</option>
+                  <option value="silver">Metallic silver</option>
+                  <option value="gold">Metallic gold</option>
+                  <option value="fixed">Fixed</option>
+                </select>
+              </label>
+              <label>
+                <span>Turn marker</span>
+                <select name="markerShape">
+                  <option value="circle" selected>Circle</option>
+                  <option value="square">Square</option>
+                  <option value="diamond">Diamond</option>
+                  <option value="hexagon">Hexagon</option>
+                  <option value="random">Random</option>
+                  <option value="none">None</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Grid geometry</legend>
+            <div class="range-list">
+              <div class="range-control">
+                <label for="baseSpacingRange">Base spacing</label>
+                <div class="range-row">
+                  <input
+                    id="baseSpacingRange"
+                    data-range="baseSpacing"
+                    type="range"
+                    min="16"
+                    max="64"
+                    step="1"
+                    value="32"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Base spacing in pixels"
+                      data-number="baseSpacing"
+                      name="baseSpacing"
+                      type="number"
+                      min="16"
+                      max="64"
+                      step="1"
+                      value="32"
+                    />
+                    <span>px</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="coarseIntervalRange">Coarse interval</label>
+                <div class="range-row">
+                  <input
+                    id="coarseIntervalRange"
+                    data-range="coarseInterval"
+                    type="range"
+                    min="2"
+                    max="8"
+                    step="1"
+                    value="5"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Coarse interval multiplier"
+                      data-number="coarseInterval"
+                      name="coarseInterval"
+                      type="number"
+                      min="2"
+                      max="8"
+                      step="1"
+                      value="5"
+                    />
+                    <span>×</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="fineWidthRange">Fine line width</label>
+                <div class="range-row">
+                  <input
+                    id="fineWidthRange"
+                    data-range="fineWidth"
+                    type="range"
+                    min="0.25"
+                    max="3"
+                    step="0.25"
+                    value="0.75"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Fine line width"
+                      data-number="fineWidth"
+                      name="fineWidth"
+                      type="number"
+                      min="0.25"
+                      max="3"
+                      step="0.25"
+                      value="0.75"
+                    />
+                    <span>px</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="coarseWidthRange">Coarse line width</label>
+                <div class="range-row">
+                  <input
+                    id="coarseWidthRange"
+                    data-range="coarseWidth"
+                    type="range"
+                    min="0.25"
+                    max="4"
+                    step="0.25"
+                    value="1"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Coarse line width"
+                      data-number="coarseWidth"
+                      name="coarseWidth"
+                      type="number"
+                      min="0.25"
+                      max="4"
+                      step="0.25"
+                      value="1"
+                    />
+                    <span>px</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="fineOpacityRange">Fine line opacity</label>
+                <div class="range-row">
+                  <input
+                    id="fineOpacityRange"
+                    data-range="fineOpacity"
+                    type="range"
+                    min="0.05"
+                    max="1"
+                    step="0.05"
+                    value="1"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Fine line opacity"
+                      data-number="fineOpacity"
+                      name="fineOpacity"
+                      type="number"
+                      min="0.05"
+                      max="1"
+                      step="0.05"
+                      value="1"
+                    />
+                    <span>α</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="coarseOpacityRange">Coarse line opacity</label>
+                <div class="range-row">
+                  <input
+                    id="coarseOpacityRange"
+                    data-range="coarseOpacity"
+                    type="range"
+                    min="0.05"
+                    max="1"
+                    step="0.05"
+                    value="1"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Coarse line opacity"
+                      data-number="coarseOpacity"
+                      name="coarseOpacity"
+                      type="number"
+                      min="0.05"
+                      max="1"
+                      step="0.05"
+                      value="1"
+                    />
+                    <span>α</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Route animation</legend>
+            <div class="range-list">
+              <div class="range-control">
+                <label for="routeWidthRange">Route width</label>
+                <div class="range-row">
+                  <input
+                    id="routeWidthRange"
+                    data-range="routeWidth"
+                    type="range"
+                    min="0.5"
+                    max="6"
+                    step="0.25"
+                    value="2"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Route width"
+                      data-number="routeWidth"
+                      name="routeWidth"
+                      type="number"
+                      min="0.5"
+                      max="6"
+                      step="0.25"
+                      value="2"
+                    />
+                    <span>px</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="routeSpeedRange">Route speed</label>
+                <div class="range-row">
+                  <input
+                    id="routeSpeedRange"
+                    data-range="routeSpeed"
+                    type="range"
+                    min="40"
+                    max="240"
+                    step="5"
+                    value="110"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Route speed in pixels per second"
+                      data-number="routeSpeed"
+                      name="routeSpeed"
+                      type="number"
+                      min="40"
+                      max="240"
+                      step="5"
+                      value="110"
+                    />
+                    <span>px/s</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="trailDurationRange">Trail delay</label>
+                <div class="range-row">
+                  <input
+                    id="trailDurationRange"
+                    data-range="trailDuration"
+                    type="range"
+                    min="200"
+                    max="2400"
+                    step="50"
+                    value="950"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Trail delay in milliseconds"
+                      data-number="trailDuration"
+                      name="trailDuration"
+                      type="number"
+                      min="200"
+                      max="2400"
+                      step="50"
+                      value="950"
+                    />
+                    <span>ms</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="spawnIntervalRange">Spawn interval</label>
+                <div class="range-row">
+                  <input
+                    id="spawnIntervalRange"
+                    data-range="spawnInterval"
+                    type="range"
+                    min="250"
+                    max="2500"
+                    step="25"
+                    value="875"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Spawn interval in milliseconds"
+                      data-number="spawnInterval"
+                      name="spawnInterval"
+                      type="number"
+                      min="250"
+                      max="2500"
+                      step="25"
+                      value="875"
+                    />
+                    <span>ms</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="maxRoutesRange">Active routes</label>
+                <div class="range-row">
+                  <input
+                    id="maxRoutesRange"
+                    data-range="maxRoutes"
+                    type="range"
+                    min="1"
+                    max="12"
+                    step="1"
+                    value="6"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Maximum active routes"
+                      data-number="maxRoutes"
+                      name="maxRoutes"
+                      type="number"
+                      min="1"
+                      max="12"
+                      step="1"
+                      value="6"
+                    />
+                    <span>max</span>
+                  </span>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="markerSizeRange">Marker size</label>
+                <div class="range-row">
+                  <input
+                    id="markerSizeRange"
+                    data-range="markerSize"
+                    type="range"
+                    min="2"
+                    max="10"
+                    step="0.5"
+                    value="4.5"
+                  />
+                  <span class="number-shell">
+                    <input
+                      aria-label="Turn marker size"
+                      data-number="markerSize"
+                      name="markerSize"
+                      type="number"
+                      min="2"
+                      max="10"
+                      step="0.5"
+                      value="4.5"
+                    />
+                    <span>px</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </aside>
+
+      <section class="output-column" aria-label="Preview and generated code">
+        <section class="preview-panel" aria-labelledby="preview-title">
+          <div class="window-bar">
+            <div class="window-dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <h2 id="preview-title">Preview</h2>
+            <span class="window-label">index.html</span>
+          </div>
+          <iframe
+            data-preview
+            title="Generated isometric background preview"
+            sandbox="allow-scripts"
+          ></iframe>
+        </section>
+
+        <section class="code-panel" aria-labelledby="code-title">
+          <div class="code-heading">
+            <div>
+              <p class="panel-kicker">Standalone output</p>
+              <h2 id="code-title">Generated HTML</h2>
+            </div>
+            <button class="copy-code-button" type="button" data-copy>
+              Copy full HTML
+            </button>
+          </div>
+          <p class="code-help">
+            The grid CSS lives near the top; the inline script adds animated
+            routes.
+          </p>
+          <textarea
+            data-code
+            aria-label="Generated standalone HTML"
+            readonly
+            spellcheck="false"
+          ></textarea>
+          <p class="copy-status" data-copy-status role="status" aria-live="polite">
+            Ready to copy.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./generator.js"></script>
+  </body>
+</html>

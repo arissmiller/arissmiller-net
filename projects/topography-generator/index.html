@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Generate deterministic SVG contour maps from layered Perlin noise."
+    />
+    <title>Topography Generator — Armen Rissmiller</title>
+    <link rel="stylesheet" href="./topography.css" />
+  </head>
+
+  <body>
+    <header class="tool-header">
+      <a class="back-link" href="/projects/">Projects</a>
+      <div>
+        <p class="eyebrow">Noise → elevation → isolines</p>
+        <h1>Topography Generator</h1>
+      </div>
+      <div class="header-actions">
+        <button class="secondary-button" type="button" data-randomize>
+          New terrain
+        </button>
+        <button class="primary-button" type="button" data-download>
+          Download SVG
+        </button>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <aside class="controls-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="panel-label">Configuration</p>
+            <h2>Terrain model</h2>
+          </div>
+          <span class="status-light">Live</span>
+        </div>
+
+        <form data-controls>
+          <label class="control">
+            <span>Seed</span>
+            <input name="seed" type="number" min="0" max="999999" value="4182" />
+          </label>
+
+          <label class="control">
+            <span>Terrain scale <output data-output="scale">3.2</output></span>
+            <input
+              name="scale"
+              type="range"
+              min="1.2"
+              max="8"
+              step="0.1"
+              value="3.2"
+            />
+          </label>
+
+          <label class="control">
+            <span>Elongation <output data-output="elongation">1</output></span>
+            <input
+              name="elongation"
+              type="range"
+              min="0.5"
+              max="4"
+              step="0.05"
+              value="1"
+            />
+          </label>
+
+          <label class="control">
+            <span>Angle <output data-output="angle">0°</output></span>
+            <input
+              name="angle"
+              type="range"
+              min="-180"
+              max="180"
+              step="1"
+              value="0"
+            />
+          </label>
+
+          <label class="control">
+            <span>Octaves <output data-output="octaves">4</output></span>
+            <input
+              name="octaves"
+              type="range"
+              min="1"
+              max="7"
+              step="1"
+              value="4"
+            />
+          </label>
+
+          <label class="control">
+            <span>Roughness <output data-output="persistence">0.52</output></span>
+            <input
+              name="persistence"
+              type="range"
+              min="0.2"
+              max="0.8"
+              step="0.01"
+              value="0.52"
+            />
+          </label>
+
+          <label class="control">
+            <span>Contour count <output data-output="contours">16</output></span>
+            <input
+              name="contours"
+              type="range"
+              min="5"
+              max="30"
+              step="1"
+              value="16"
+            />
+          </label>
+
+          <label class="control">
+            <span>Sampling density <output data-output="resolution">150</output></span>
+            <input
+              name="resolution"
+              type="range"
+              min="60"
+              max="240"
+              step="10"
+              value="150"
+            />
+          </label>
+
+          <div class="color-controls">
+            <label class="control">
+              <span>Paper</span>
+              <input name="background" type="color" value="#f1f0e7" />
+            </label>
+            <label class="control">
+              <span>Ink</span>
+              <input name="stroke" type="color" value="#111111" />
+            </label>
+          </div>
+
+          <label class="control">
+            <span>Line weight <output data-output="strokeWidth">0.9</output></span>
+            <input
+              name="strokeWidth"
+              type="range"
+              min="0.35"
+              max="2.4"
+              step="0.05"
+              value="0.9"
+            />
+          </label>
+        </form>
+
+        <p class="method-note">
+          Layered, seeded Perlin noise is sampled as elevation data. Marching
+          squares then extracts a family of SVG isolines.
+        </p>
+      </aside>
+
+      <section class="preview-panel" aria-labelledby="preview-title">
+        <div class="preview-toolbar">
+          <div>
+            <p class="panel-label">Output</p>
+            <h2 id="preview-title">Contour field</h2>
+          </div>
+          <p class="dimensions">900 × 360 SVG</p>
+        </div>
+        <div class="preview-stage" data-preview aria-live="polite"></div>
+        <footer class="preview-footer">
+          <span data-seed-readout>Seed 4182</span>
+          <button class="text-button" type="button" data-copy>
+            Copy SVG
+          </button>
+        </footer>
+      </section>
+    </main>
+
+    <p class="toast" data-toast role="status" aria-live="polite"></p>
+    <script type="module" src="./ui.js"></script>
+  </body>
+</html>

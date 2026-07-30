@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Photographs by Armen Rissmiller."
+    />
+    <title>Photographs — Armen Rissmiller</title>
+
+    <style>
+      :root {
+        color-scheme: light;
+        background: #87cbed;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        overflow: hidden;
+        background-color: #87cbed;
+        background-image: url("/assets/images/photographs/rolling-hills-original.png");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .desktop {
+        min-height: 100vh;
+        padding: clamp(1.5rem, 4vw, 3.5rem);
+      }
+
+      .desktop-icons {
+        width: max-content;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .desktop-folder,
+      .desktop-home-link {
+        width: 7rem;
+        margin: 0;
+        padding: 0.5rem;
+        display: block;
+        border: 1px solid transparent;
+        color: #ffffff;
+        background: transparent;
+        font-family: Tahoma, "MS Sans Serif", sans-serif;
+        font-size: 0.78rem;
+        line-height: 1.2;
+        text-align: center;
+        text-decoration: none;
+        text-shadow:
+          1px 1px 0 #18374a,
+          -1px -1px 0 rgba(24, 55, 74, 0.5);
+        cursor: default;
+      }
+
+      .desktop-folder:hover,
+      .desktop-folder:focus-visible,
+      .desktop-home-link:hover,
+      .desktop-home-link:focus-visible {
+        border-color: rgba(255, 255, 255, 0.9);
+        background: rgba(0, 80, 160, 0.34);
+        outline: 1px dotted #ffffff;
+        outline-offset: -0.25rem;
+      }
+
+      .folder-icon,
+      .desktop-home-icon {
+        width: 4.6rem;
+        height: 3.55rem;
+        display: block;
+        margin: 0 auto 0.45rem;
+        filter: drop-shadow(2px 3px 1px rgba(0, 0, 0, 0.28));
+      }
+
+      .folder-icon {
+        position: relative;
+      }
+
+      .desktop-home-icon {
+        shape-rendering: crispEdges;
+      }
+
+      .folder-icon::before {
+        content: "";
+        position: absolute;
+        top: 0.15rem;
+        left: 0.25rem;
+        z-index: 0;
+        width: 2rem;
+        height: 1rem;
+        border: 2px solid #80691b;
+        background: #e9c445;
+      }
+
+      .folder-icon::after {
+        content: "";
+        position: absolute;
+        inset: 0.72rem 0 0;
+        z-index: 1;
+        border: 2px solid #80691b;
+        border-radius: 2px;
+        background:
+          linear-gradient(
+            180deg,
+            #fff5a4 0 12%,
+            #f4d657 12% 58%,
+            #dfb93d 100%
+          );
+        box-shadow:
+          inset 2px 2px 0 rgba(255, 255, 255, 0.48),
+          inset -2px -2px 0 rgba(127, 93, 15, 0.22);
+      }
+
+      .gallery-window {
+        width: min(90vw, 78rem);
+        height: min(86vh, 52rem);
+        max-width: none;
+        max-height: none;
+        margin: auto;
+        padding: 0;
+        border: 0;
+        color: #d9f8ff;
+        background: transparent;
+      }
+
+      .gallery-window:not([open]) {
+        display: none;
+      }
+
+      .gallery-window[open] {
+        display: grid;
+      }
+
+      .gallery-window::backdrop {
+        background: rgba(5, 16, 24, 0.38);
+        backdrop-filter: blur(2px) saturate(0.85);
+      }
+
+      .gallery-window.is-maximized {
+        width: calc(100vw - 1rem);
+        height: calc(100vh - 1rem);
+      }
+
+      .gallery-window-shell {
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr);
+        border: 1px solid rgba(83, 226, 255, 0.88);
+        border-radius: 0.55rem;
+        background:
+          linear-gradient(
+            rgba(55, 206, 234, 0.045) 1px,
+            transparent 1px
+          )
+          0 0 / 1.5rem 1.5rem,
+          linear-gradient(
+            90deg,
+            rgba(55, 206, 234, 0.045) 1px,
+            transparent 1px
+          )
+          0 0 / 1.5rem 1.5rem,
+          rgba(4, 14, 25, 0.96);
+        box-shadow:
+          0 0 0 1px rgba(83, 226, 255, 0.18),
+          0 0 2rem rgba(15, 198, 235, 0.24),
+          0 2rem 5rem rgba(0, 0, 0, 0.4);
+      }
+
+      .gallery-titlebar {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.65rem 0.75rem;
+        border-bottom: 1px solid rgba(83, 226, 255, 0.58);
+        background: linear-gradient(
+          90deg,
+          rgba(16, 52, 72, 0.98),
+          rgba(4, 17, 31, 0.98)
+        );
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+      }
+
+      .gallery-status-light {
+        width: 0.55rem;
+        aspect-ratio: 1;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: #5af6c4;
+        box-shadow: 0 0 0.7rem #5af6c4;
+      }
+
+      .gallery-window-title {
+        min-width: 0;
+        margin: 0;
+        overflow: hidden;
+        color: #d9f8ff;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .gallery-controls {
+        display: flex;
+        gap: 0.35rem;
+        margin-left: auto;
+      }
+
+      .gallery-control {
+        width: 1.75rem;
+        aspect-ratio: 1;
+        padding: 0;
+        border: 1px solid rgba(83, 226, 255, 0.55);
+        border-radius: 0.2rem;
+        color: #aeefff;
+        background: rgba(46, 177, 206, 0.08);
+        font-size: 0.9rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .gallery-control:hover,
+      .gallery-control:focus-visible {
+        color: #ffffff;
+        border-color: #5ce7ff;
+        background: rgba(46, 177, 206, 0.3);
+        outline: none;
+      }
+
+      .gallery-control-close:hover,
+      .gallery-control-close:focus-visible {
+        border-color: #ff6f98;
+        background: rgba(255, 60, 115, 0.3);
+      }
+
+      .gallery-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid rgba(83, 226, 255, 0.22);
+        color: #67d9ed;
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .gallery-viewport {
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 1.35rem;
+      }
+
+      .gallery-grid {
+        width: 100%;
+        min-height: 0;
+        min-width: 0;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fill,
+          minmax(min(100%, 13rem), 1fr)
+        );
+        grid-auto-rows: 11rem;
+        align-content: start;
+        gap: clamp(1rem, 2vw, 1.5rem);
+        padding: clamp(1.25rem, 2.5vw, 2rem);
+        scrollbar-width: none;
+      }
+
+      .gallery-grid::-webkit-scrollbar {
+        display: none;
+      }
+
+      .retro-scrollbar {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: 1.35rem minmax(0, 1fr) 1.35rem;
+        border-left: 1px solid #1d7283;
+        background: #123b48;
+        box-shadow: inset 1px 0 0 #65b9c8;
+      }
+
+      .retro-scroll-button {
+        position: relative;
+        width: 100%;
+        height: 1.35rem;
+        padding: 0;
+        border: 2px solid;
+        border-color: #d5faff #1d6d7c #1d6d7c #d5faff;
+        border-radius: 0;
+        background: #5fc1d1;
+        cursor: pointer;
+      }
+
+      .retro-scroll-button::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-inline: 0.28rem solid transparent;
+        transform: translate(-50%, -58%);
+      }
+
+      .retro-scroll-button-up::before {
+        border-bottom: 0.38rem solid #103b47;
+      }
+
+      .retro-scroll-button-down::before {
+        border-top: 0.38rem solid #103b47;
+        transform: translate(-50%, -38%);
+      }
+
+      .retro-scroll-button:hover,
+      .retro-scroll-button:focus-visible {
+        background: #87dce7;
+        outline: 1px solid #e3fcff;
+        outline-offset: -3px;
+      }
+
+      .retro-scroll-track {
+        position: relative;
+        min-height: 0;
+        overflow: hidden;
+        background:
+          repeating-linear-gradient(
+            135deg,
+            rgba(190, 244, 250, 0.18) 0 2px,
+            transparent 2px 4px
+          ),
+          #123b48;
+        box-shadow:
+          inset 1px 1px 0 #071b22,
+          inset -1px -1px 0 #65b9c8;
+        cursor: default;
+      }
+
+      .retro-scroll-thumb {
+        position: absolute;
+        top: 0;
+        right: 1px;
+        left: 1px;
+        min-height: 2.5rem;
+        border: 2px solid;
+        border-color: #d5faff #1d6d7c #1d6d7c #d5faff;
+        background: linear-gradient(90deg, #80dbe7, #43aec0);
+        box-shadow:
+          inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+          inset -1px -1px 0 rgba(3, 59, 70, 0.55);
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        will-change: transform;
+      }
+
+      .retro-scroll-thumb:hover,
+      .retro-scroll-thumb.is-dragging {
+        background: linear-gradient(90deg, #a1edf4, #5bc7d8);
+      }
+
+      .retro-scroll-thumb.is-dragging {
+        cursor: grabbing;
+      }
+
+      .gallery-item {
+        position: relative;
+        min-width: 0;
+        min-height: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        contain: strict;
+        isolation: isolate;
+        aspect-ratio: auto;
+        border: 1px solid rgba(83, 226, 255, 0.3);
+        border-radius: 0.3rem;
+        background: #071725;
+      }
+
+      .gallery-item::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        box-shadow: inset 0 0 1.5rem rgba(26, 208, 237, 0.12);
+      }
+
+      .gallery-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        transition:
+          filter 180ms ease,
+          transform 300ms ease;
+      }
+
+      .gallery-item:hover {
+        border-color: rgba(97, 235, 255, 0.78);
+      }
+
+      .gallery-item:hover .gallery-image {
+        filter: saturate(1.08) contrast(1.03);
+        transform: scale(1.025);
+      }
+
+      @media (max-width: 640px) {
+        .gallery-window {
+          width: calc(100vw - 1rem);
+          height: calc(100vh - 1rem);
+        }
+
+        .gallery-toolbar {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .gallery-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-auto-rows: 8rem;
+          gap: 0.75rem;
+          padding: 0.85rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .gallery-image {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="desktop" aria-label="Photograph galleries">
+      <div class="desktop-icons">
+        <a class="desktop-home-link" href="/">
+          <svg
+            class="desktop-home-icon"
+            viewBox="0 0 72 56"
+            aria-hidden="true"
+          >
+            <path
+              d="M7 27 36 5l29 22-5 7-24-18L12 34Z"
+              fill="#68c8e8"
+              stroke="#154e72"
+              stroke-width="3"
+              stroke-linejoin="miter"
+            />
+            <path
+              d="M15 29 36 13l21 16v22H15Z"
+              fill="#f3efe1"
+              stroke="#365a68"
+              stroke-width="3"
+            />
+            <path
+              d="M30 34h12v17H30Z"
+              fill="#4c9bc2"
+              stroke="#244f67"
+              stroke-width="2"
+            />
+            <path
+              d="M18 31h9v9h-9Zm27 0h9v9h-9Z"
+              fill="#8ee7f3"
+              stroke="#315d70"
+              stroke-width="2"
+            />
+            <path
+              d="M33 38h6"
+              stroke="#d7faff"
+              stroke-width="2"
+            />
+          </svg>
+          <span>Home</span>
+        </a>
+
+        <button
+          class="desktop-folder"
+          type="button"
+          data-open-paint-swirls
+          aria-haspopup="dialog"
+        >
+          <span class="folder-icon" aria-hidden="true"></span>
+          <span>Paint Swirls</span>
+        </button>
+      </div>
+    </main>
+
+    <dialog
+      class="gallery-window"
+      data-gallery-window
+      aria-labelledby="paint-swirl-window-title"
+    >
+      <section class="gallery-window-shell">
+        <header class="gallery-titlebar">
+          <span class="gallery-status-light" aria-hidden="true"></span>
+          <h1
+            class="gallery-window-title"
+            id="paint-swirl-window-title"
+          >
+            Paint Swirls / Visual Archive
+          </h1>
+          <div class="gallery-controls">
+            <button
+              class="gallery-control"
+              type="button"
+              data-minimize-gallery
+              aria-label="Minimize Paint Swirls"
+            >
+              &minus;
+            </button>
+            <button
+              class="gallery-control"
+              type="button"
+              data-maximize-gallery
+              aria-label="Maximize Paint Swirls"
+            >
+              □
+            </button>
+            <button
+              class="gallery-control gallery-control-close"
+              type="button"
+              data-close-gallery
+              aria-label="Close Paint Swirls"
+            >
+              ×
+            </button>
+          </div>
+        </header>
+
+        <div class="gallery-toolbar">
+          <span>Archive / Paint_Swirls</span>
+          <span data-image-count>Loading visual records…</span>
+        </div>
+
+        <div class="gallery-viewport">
+          <section
+            class="gallery-grid"
+            id="paint-swirl-grid"
+            data-gallery-grid
+            aria-label="Paint swirl photographs"
+            tabindex="0"
+          ></section>
+          <aside class="retro-scrollbar" aria-label="Gallery scrollbar">
+            <button
+              class="retro-scroll-button retro-scroll-button-up"
+              type="button"
+              data-scroll-up
+              aria-label="Scroll gallery up"
+            ></button>
+            <div class="retro-scroll-track" data-scroll-track>
+              <div
+                class="retro-scroll-thumb"
+                data-scroll-thumb
+                role="scrollbar"
+                aria-controls="paint-swirl-grid"
+                aria-orientation="vertical"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+              ></div>
+            </div>
+            <button
+              class="retro-scroll-button retro-scroll-button-down"
+              type="button"
+              data-scroll-down
+              aria-label="Scroll gallery down"
+            ></button>
+          </aside>
+        </div>
+      </section>
+    </dialog>
+
+    <script type="module" src="/photographs/photographs.js"></script>
+  </body>
+</html>

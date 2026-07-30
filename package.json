@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "generate:topography": "node tools/generate-topography.mjs",
     "preview": "vite preview",
     "start": "vite preview --host 0.0.0.0 --port ${PORT:-4173}"
   },
   "devDependencies": {
+    "marked": "^18.0.7",
     "vite": "^6.4.2"
   }
 }
