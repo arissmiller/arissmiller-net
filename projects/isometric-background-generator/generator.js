@@ -54,7 +54,9 @@ const getConfig = () => {
 };
 
 const formatNumber = (value) =>
-  Number(value.toFixed(4)).toString();
+  Number(value.toFixed(6)).toString();
+
+const ISOMETRIC_SLOPE = 1 / Math.sqrt(3);
 
 const gridLineAttributes = (style, spacing) => {
   if (style === "dashed") {
@@ -72,48 +74,95 @@ const gridLineAttributes = (style, spacing) => {
   return 'stroke-linecap="butt"';
 };
 
-const makeGridDataUri = ({
-  width,
-  color,
+const makeGridPath = ({
+  tileWidth,
+  tileHeight,
+  baseSpacing,
   lineWidth,
-  opacity,
-  style,
+  interval,
 }) => {
-  const height = width * Math.tan(Math.PI / 6);
-  const halfWidth = width / 2;
   const bleed = Math.max(2, lineWidth * 2);
-  const diagonalBleed = bleed * Math.tan(Math.PI / 6);
+  const segments = [];
+
+  for (
+    let x = 0;
+    x <= tileWidth + Number.EPSILON;
+    x += baseSpacing / 2
+  ) {
+    segments.push(
+      `M${formatNumber(x)} -${formatNumber(bleed)}V${formatNumber(
+        tileHeight + bleed,
+      )}`,
+    );
+  }
+
+  for (let index = -interval; index <= interval; index += 1) {
+    const intercept = index * baseSpacing * ISOMETRIC_SLOPE;
+    segments.push(
+      `M-${formatNumber(bleed)} ${formatNumber(
+        intercept - bleed * ISOMETRIC_SLOPE,
+      )}L${formatNumber(tileWidth + bleed)} ${formatNumber(
+        intercept + tileHeight + bleed * ISOMETRIC_SLOPE,
+      )}`,
+    );
+  }
+
+  for (let index = 0; index <= interval * 2; index += 1) {
+    const intercept = index * baseSpacing * ISOMETRIC_SLOPE;
+    segments.push(
+      `M-${formatNumber(bleed)} ${formatNumber(
+        intercept + bleed * ISOMETRIC_SLOPE,
+      )}L${formatNumber(tileWidth + bleed)} ${formatNumber(
+        intercept - tileHeight - bleed * ISOMETRIC_SLOPE,
+      )}`,
+    );
+  }
+
+  return segments.join("");
+};
+
+const makeCombinedGridDataUri = (config) => {
+  const width = config.baseSpacing * config.coarseInterval;
+  const height = width * ISOMETRIC_SLOPE;
+  const finePath = makeGridPath({
+    tileWidth: width,
+    tileHeight: height,
+    baseSpacing: config.baseSpacing,
+    lineWidth: config.fineWidth,
+    interval: config.coarseInterval,
+  });
+  const coarsePath = makeGridPath({
+    tileWidth: width,
+    tileHeight: height,
+    baseSpacing: width,
+    lineWidth: config.coarseWidth,
+    interval: 1,
+  });
   const svg = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${formatNumber(
       width,
     )}" height="${formatNumber(height)}" viewBox="0 0 ${formatNumber(
       width,
     )} ${formatNumber(height)}">`,
-    `<path d="M0 -${formatNumber(bleed)}V${formatNumber(
-      height + bleed,
-    )}M${formatNumber(
-      halfWidth,
-    )} -${formatNumber(bleed)}V${formatNumber(
-      height + bleed,
-    )}M${formatNumber(width)} -${formatNumber(bleed)}V${formatNumber(
-      height + bleed,
-    )}M-${formatNumber(bleed)} -${formatNumber(
-      diagonalBleed,
-    )}L${formatNumber(width + bleed)} ${formatNumber(
-      height + diagonalBleed,
-    )}M-${formatNumber(bleed)} ${formatNumber(
-      height + diagonalBleed,
-    )}L${formatNumber(width + bleed)} -${formatNumber(
-      diagonalBleed,
-    )}" fill="none" stroke="${color}" stroke-opacity="${formatNumber(
-      opacity,
-    )}" stroke-width="${formatNumber(lineWidth)}" ${gridLineAttributes(
-      style,
+    `<path d="${finePath}" fill="none" stroke="${config.fineColor}" stroke-opacity="${formatNumber(
+      config.fineOpacity,
+    )}" stroke-width="${formatNumber(config.fineWidth)}" ${gridLineAttributes(
+      config.gridStyle,
+      config.baseSpacing,
+    )}/>`,
+    `<path d="${coarsePath}" fill="none" stroke="${config.coarseColor}" stroke-opacity="${formatNumber(
+      config.coarseOpacity,
+    )}" stroke-width="${formatNumber(config.coarseWidth)}" ${gridLineAttributes(
+      config.gridStyle,
       width,
     )}/></svg>`,
   ].join("");
 
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  return {
+    dataUri: `data:image/svg+xml,${encodeURIComponent(svg)}`,
+    height,
+    width,
+  };
 };
 
 const routeDashArray = (style) => {
@@ -129,7 +178,7 @@ function routeRuntime(config) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const svgNamespace = "http://www.w3.org/2000/svg";
   const gridX = config.baseSpacing / 2;
-  const gridY = (config.baseSpacing * Math.tan(Math.PI / 6)) / 2;
+  const gridY = config.baseSpacing / Math.sqrt(3) / 2;
   const regionColumns = 4;
   const regionRows = 3;
   const directions = [
@@ -452,8 +501,8 @@ function routeRuntime(config) {
     const pathDefinition = points
       .map(
         (point, index) =>
-          `${index === 0 ? "M" : "L"}${point.x.toFixed(3)} ${point.y.toFixed(
-            3,
+          `${index === 0 ? "M" : "L"}${point.x.toFixed(6)} ${point.y.toFixed(
+            6,
           )}`,
       )
       .join(" ");
@@ -615,20 +664,7 @@ function routeRuntime(config) {
 }
 
 const buildDocument = (config) => {
-  const fineGrid = makeGridDataUri({
-    width: config.baseSpacing,
-    color: config.fineColor,
-    lineWidth: config.fineWidth,
-    opacity: config.fineOpacity,
-    style: config.gridStyle,
-  });
-  const coarseGrid = makeGridDataUri({
-    width: config.baseSpacing * config.coarseInterval,
-    color: config.coarseColor,
-    lineWidth: config.coarseWidth,
-    opacity: config.coarseOpacity,
-    style: config.gridStyle,
-  });
+  const grid = makeCombinedGridDataUri(config);
   const dashArray = routeDashArray(config.routeStyle);
   const lineCap = config.routeStyle === "dotted" ? "round" : "round";
   const serializedConfig = JSON.stringify(config, null, 2);
@@ -660,10 +696,9 @@ const buildDocument = (config) => {
         min-height: 100vh;
         overflow: hidden;
         background-color: ${config.backgroundColor};
-        background-image:
-          url("${coarseGrid}"),
-          url("${fineGrid}");
-        background-position: 0 0, 0 0;
+        background-image: url("${grid.dataUri}");
+        background-position: 0 0;
+        background-size: ${formatNumber(grid.width)}px ${formatNumber(grid.height)}px;
         background-repeat: repeat;
       }
 
