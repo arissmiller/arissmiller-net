@@ -1,3 +1,4 @@
+// Links default to "resource". Set kind: "personal" for personal picks.
 export const categories = [
   {
     id: "reading",
@@ -21,6 +22,12 @@ export const categories = [
         url: "https://en.wikisource.org/wiki/Main_Page",
         description:
           "A free library of source texts, historical documents, translations, and public-domain books.",
+      },
+      {
+        title: "Project Gutenberg",
+        url: "https://www.gutenberg.org/",
+        description:
+          "A volunteer-built library of free ebooks, with a focus on older works whose copyrights have expired.",
       },
     ],
   },

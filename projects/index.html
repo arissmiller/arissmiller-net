@@ -264,6 +264,42 @@
           28px 28px;
       }
 
+      .project-card-voronoi-preview {
+        background: #173f3a;
+      }
+
+      .project-card-voronoi-preview::before,
+      .project-card-voronoi-preview::after {
+        content: "";
+        position: absolute;
+        inset: 8%;
+        background: #f3c969;
+        clip-path: polygon(0 17%, 25% 0, 43% 19%, 68% 3%, 100% 20%, 91% 53%, 100% 85%, 70% 100%, 45% 83%, 21% 100%, 0 76%, 11% 47%);
+      }
+
+      .project-card-animated-voronoi-preview::before {
+        animation: voronoi-breathe 4s ease-in-out infinite alternate;
+      }
+
+      .project-card-animated-voronoi-preview::after {
+        animation: voronoi-drift 5s ease-in-out infinite alternate;
+      }
+
+      @keyframes voronoi-breathe {
+        to { transform: scale(1.08) rotate(4deg); }
+      }
+
+      @keyframes voronoi-drift {
+        to { transform: scale(0.88) translate(3%, -2%) rotate(-5deg); }
+      }
+
+      .project-card-voronoi-preview::after {
+        inset: 11%;
+        background: #173f3a;
+        transform: scale(0.95);
+        clip-path: polygon(19% 12%, 37% 2%, 50% 29%, 71% 8%, 93% 24%, 78% 49%, 94% 74%, 67% 91%, 48% 72%, 27% 94%, 8% 69%, 24% 45%);
+      }
+
       .circuit-preview-chip {
         position: relative;
         z-index: 1;
@@ -408,6 +444,52 @@
     <a class="projects-home-link" href="/">Home</a>
 
     <main class="project-board" aria-label="Project card layout mockup">
+      <a
+        class="project-card"
+        href="/projects/animated-voronoi-field/"
+      >
+        <div
+          class="project-card-media project-card-media-filled project-card-voronoi-preview project-card-animated-voronoi-preview"
+          aria-hidden="true"
+        ></div>
+        <div class="project-card-body">
+          <h2 class="project-card-title">Animated Voronoi Field</h2>
+          <div class="project-card-labels">
+            <span class="project-card-label project-card-type-graphics">
+              Interactive Tool
+            </span>
+            <span class="project-card-label project-card-warning">
+              WebGL required
+            </span>
+          </div>
+          <p class="project-card-description">
+            Drift through a continuously generated Voronoi world with local motion and shifting color.
+          </p>
+        </div>
+      </a>
+      <a
+        class="project-card"
+        href="/projects/voronoi-generator/"
+      >
+        <div
+          class="project-card-media project-card-media-filled project-card-voronoi-preview"
+          aria-hidden="true"
+        ></div>
+        <div class="project-card-body">
+          <h2 class="project-card-title">Voronoi Pattern Generator</h2>
+          <div class="project-card-labels">
+            <span class="project-card-label project-card-type-graphics">
+              Interactive Tool
+            </span>
+            <span class="project-card-label project-card-warning">
+              JavaScript required
+            </span>
+          </div>
+          <p class="project-card-description">
+            Build separated Euclidean or Manhattan cell patterns and export them as PNG.
+          </p>
+        </div>
+      </a>
       <a
         class="project-card"
         href="/projects/topography-generator/"

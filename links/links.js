@@ -1,13 +1,23 @@
 import { categories } from "./catalog.js";
 
+document.documentElement.classList.add("has-js");
+
 const tabsElement = document.querySelector("[data-category-tabs]");
 const panelElement = document.querySelector("[data-link-panel]");
 const listElement = document.querySelector("[data-link-list]");
+const linkIndex = document.querySelector(".link-index");
 const emptyState = document.querySelector("[data-empty-state]");
 const activeLabel = document.querySelector("[data-active-label]");
 const resultCount = document.querySelector("[data-result-count]");
 const canvas = document.querySelector("[data-circuit-field]");
 const linkItems = [...listElement.querySelectorAll("[data-category-id]")];
+const detail = document.querySelector("[data-link-detail]");
+const detailCategory = document.querySelector("[data-detail-category]");
+const detailKind = document.querySelector("[data-detail-kind]");
+const detailTitle = document.querySelector("[data-detail-title]");
+const detailDescription = document.querySelector("[data-detail-description]");
+const detailDomain = document.querySelector("[data-detail-domain]");
+const detailLink = document.querySelector("[data-detail-link]");
 
 const allCategory = {
   id: "all",
@@ -23,6 +33,38 @@ function categoryFromHash() {
     .trim()
     .toLowerCase();
   return catalog.find((category) => category.id === requestedId) ?? allCategory;
+}
+
+function selectLink(item) {
+  if (!item || item.hidden) return;
+
+  linkItems.forEach((candidate) => {
+    candidate.dataset.selected = String(candidate === item);
+  });
+
+  const sourceLink = item.querySelector(".catalog-link");
+  const sourceKind = item.querySelector(".link-kind");
+  const personal = sourceKind.classList.contains("link-kind-personal");
+  const domain = new URL(sourceLink.href).hostname.replace(/^www\./, "");
+
+  detail.style.setProperty(
+    "--detail-hue",
+    item.style.getPropertyValue("--category-hue"),
+  );
+  detailCategory.textContent = item.querySelector(".link-category").textContent;
+  detailKind.textContent = personal ? "Personal pick" : "Resource";
+  detailKind.classList.toggle("link-kind-personal", personal);
+  detailKind.classList.toggle("link-kind-resource", !personal);
+  detailTitle.textContent = item.querySelector(".link-title").textContent;
+  detailDescription.textContent = item.querySelector(
+    ".link-description",
+  ).textContent;
+  detailDomain.textContent = domain;
+  detailLink.href = sourceLink.href;
+  detailLink.setAttribute(
+    "aria-label",
+    `Visit ${detailTitle.textContent}. Opens in a new tab.`,
+  );
 }
 
 function render(category) {
@@ -49,7 +91,9 @@ function render(category) {
   });
   listElement.hidden = count === 0;
   emptyState.hidden = count !== 0;
-  panelElement.scrollTop = 0;
+  detail.hidden = count === 0;
+  linkIndex.scrollTop = 0;
+  selectLink(linkItems.find((item) => !item.hidden));
 }
 
 function selectCategory(category, { focus = false } = {}) {
@@ -100,6 +144,38 @@ tabsElement.addEventListener("keydown", (event) => {
 
   event.preventDefault();
   selectCategory(catalog[nextIndex], { focus: true });
+});
+
+listElement.addEventListener("click", (event) => {
+  const link = event.target.closest(".catalog-link");
+  if (
+    !link ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  selectLink(link.closest(".link-item"));
+});
+
+listElement.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+
+  const current = event.target.closest(".link-item");
+  if (!current) return;
+  const visibleItems = linkItems.filter((item) => !item.hidden);
+  const currentIndex = visibleItems.indexOf(current);
+  const direction = event.key === "ArrowDown" ? 1 : -1;
+  const nextIndex =
+    (currentIndex + direction + visibleItems.length) % visibleItems.length;
+
+  event.preventDefault();
+  selectLink(visibleItems[nextIndex]);
+  visibleItems[nextIndex].querySelector(".catalog-link").focus();
 });
 
 window.addEventListener("hashchange", () => {

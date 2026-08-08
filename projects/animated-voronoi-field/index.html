@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Drift across a continuously generated Voronoi color field." />
+    <title>Animated Voronoi Field — Armen Rissmiller</title>
+    <link rel="stylesheet" href="../voronoi-generator/generator.css" />
+    <link rel="stylesheet" href="./animation.css" />
+  </head>
+  <body>
+    <header class="tool-header">
+      <a class="back-link" href="/projects/">Projects</a>
+      <div class="title-block">
+        <p class="eyebrow">Noise → motion → topology</p>
+        <h1>Animated Voronoi Field</h1>
+        <p class="intro">A camera drifting across a continuously generated cell field, with gentle local motion and cycling color.</p>
+      </div>
+      <div class="header-actions">
+        <button class="secondary-button" type="button" data-reset-motion>Restart</button>
+        <button class="primary-button" type="button" data-toggle>Pause</button>
+      </div>
+    </header>
+
+    <main class="tool-layout">
+      <aside class="controls-panel">
+        <div class="panel-heading">
+          <div><p class="panel-label">Animation</p><h2>Field dynamics</h2></div>
+          <span class="status-light" data-status>Playing</span>
+        </div>
+        <form data-controls>
+          <fieldset>
+            <legend>Structure</legend>
+            <div class="segmented-control">
+              <label><input type="radio" name="metric" value="euclidean" checked /><span>Euclidean</span></label>
+              <label><input type="radio" name="metric" value="manhattan" /><span>Manhattan</span></label>
+            </div>
+            <label class="control compact seed-control"><span>Seed</span><input name="seed" type="number" min="0" max="999999" value="7614" /></label>
+            <label class="control"><span>Viewport density <output data-output="siteCount">16</output></span><input name="siteCount" type="range" min="6" max="32" step="1" value="16" /></label>
+            <label class="control"><span>Density variation <output data-output="densityVariation">65%</output></span><input name="densityVariation" type="range" min="0" max="1" step="0.05" value="0.65" /></label>
+            <label class="control"><span>Density scale <output data-output="densityScale">2.2×</output></span><input name="densityScale" type="range" min="0.6" max="6" step="0.2" value="2.2" /></label>
+            <label class="control"><span>Random subdivisions <output data-output="subdivisionChance">25%</output></span><input name="subdivisionChance" type="range" min="0" max="0.5" step="0.05" value="0.25" /></label>
+            <label class="control"><span>Subdivision spread <output data-output="subdivisionSpread">36 px</output></span><input name="subdivisionSpread" type="range" min="20" max="72" step="2" value="36" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Flow</legend>
+            <label class="control"><span>Camera direction <output data-output="flowDirection">25°</output></span><input name="flowDirection" type="range" min="0" max="360" step="1" value="25" /></label>
+            <label class="control"><span>Pan speed <output data-output="flowSpeed">0.35×</output></span><input name="flowSpeed" type="range" min="0" max="1.5" step="0.05" value="0.35" /></label>
+            <label class="control"><span>Local drift <output data-output="turbulence">55%</output></span><input name="turbulence" type="range" min="0" max="1" step="0.05" value="0.55" /></label>
+            <label class="control"><span>Drift speed <output data-output="driftSpeed">0.8×</output></span><input name="driftSpeed" type="range" min="0" max="2" step="0.1" value="0.8" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Appearance</legend>
+            <label class="control"><span>Hue speed <output data-output="hueSpeed">18°/s</output></span><input name="hueSpeed" type="range" min="-90" max="90" step="1" value="18" /></label>
+            <label class="control"><span>Cell spacing <output data-output="gap">7 px</output></span><input name="gap" type="range" min="0" max="20" step="0.5" value="7" /></label>
+            <label class="control"><span>Corner rounding <output data-output="rounding">14 px</output></span><input name="rounding" type="range" min="0" max="32" step="1" value="14" /></label>
+            <label class="check-control"><span>Show center points</span><input name="showPoints" type="checkbox" checked /></label>
+            <div class="color-grid">
+              <label class="color-control"><span>Foreground</span><input name="foreground" type="color" value="#ed6a5a" /></label>
+              <label class="color-control"><span>Background</span><input name="background" type="color" value="#172a3a" /></label>
+              <label class="color-control"><span>Line</span><input name="line" type="color" value="#f4f1de" /></label>
+            </div>
+          </fieldset>
+        </form>
+        <p class="method-note">Noise varies density across streamed chunks. Random local splits create irregular cells, while bounded drift keeps the field in motion.</p>
+      </aside>
+
+      <section class="preview-panel" aria-labelledby="preview-title">
+        <div class="preview-toolbar">
+          <div><p class="panel-label">Live field</p><h2 id="preview-title">Flow study</h2></div>
+          <span class="metric-readout" data-time>00:00.0</span>
+        </div>
+        <div class="preview-stage animated-stage" data-stage>
+          <canvas data-canvas aria-label="Animated Voronoi field"></canvas>
+          <p class="canvas-error" data-error hidden>WebGL 2 is required to render this animation.</p>
+        </div>
+        <footer class="preview-footer"><span data-cell-readout>16 visible sites · 0 chunks</span><span>Real-time WebGL</span></footer>
+      </section>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

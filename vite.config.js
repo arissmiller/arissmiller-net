@@ -276,6 +276,8 @@ function renderLinkItems() {
     .flatMap((category) =>
       category.links.map((link) => {
         const domain = new URL(link.url).hostname.replace(/^www\./, "");
+        const kind = link.kind === "personal" ? "personal" : "resource";
+        const kindLabel = kind === "personal" ? "Personal pick" : "Resource";
         return `
           <li
             class="link-item"
@@ -287,16 +289,16 @@ function renderLinkItems() {
               href="${escapeAttribute(link.url)}"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="${escapeAttribute(
-                `${link.title}, ${category.label}. Opens in a new tab.`,
-              )}"
             >
               <div class="link-copy">
                 <h3 class="link-title">${escapeAttribute(link.title)}</h3>
                 <p class="link-description">${escapeAttribute(link.description)}</p>
               </div>
               <div class="link-meta">
-                <span class="link-category">${escapeAttribute(category.label)}</span>
+                <span class="link-tags">
+                  <span class="link-category">${escapeAttribute(category.label)}</span>
+                  <span class="link-kind link-kind-${kind}">${kindLabel}</span>
+                </span>
                 <span class="link-domain">${escapeAttribute(domain)}</span>
               </div>
               <span class="external-mark" aria-hidden="true">↗</span>
@@ -306,6 +308,41 @@ function renderLinkItems() {
       }),
     )
     .join("");
+}
+
+function renderLinkDetail() {
+  const category = linkCategories[0];
+  const link = category.links[0];
+  const domain = new URL(link.url).hostname.replace(/^www\./, "");
+  const kind = link.kind === "personal" ? "personal" : "resource";
+  const kindLabel = kind === "personal" ? "Personal pick" : "Resource";
+
+  return `
+    <aside
+      class="link-detail"
+      style="--detail-hue: ${escapeAttribute(category.hue)}"
+      data-link-detail
+      aria-live="polite"
+    >
+      <div class="detail-tags">
+        <span class="detail-category" data-detail-category>${escapeAttribute(category.label)}</span>
+        <span class="link-kind link-kind-${kind}" data-detail-kind>${kindLabel}</span>
+      </div>
+      <div class="detail-copy">
+        <h3 data-detail-title>${escapeAttribute(link.title)}</h3>
+        <p data-detail-description>${escapeAttribute(link.description)}</p>
+      </div>
+      <div class="detail-action">
+        <span data-detail-domain>${escapeAttribute(domain)}</span>
+        <a
+          href="${escapeAttribute(link.url)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-detail-link
+        >Visit site <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
+  `;
 }
 
 function staticLinks() {
@@ -320,7 +357,8 @@ function staticLinks() {
 
         return html
           .replace("<!-- LINKS_TABS -->", renderLinkTabs())
-          .replace("<!-- LINKS_ITEMS -->", renderLinkItems());
+          .replace("<!-- LINKS_ITEMS -->", renderLinkItems())
+          .replace("<!-- LINKS_DETAIL -->", renderLinkDetail());
       },
     },
   };
@@ -482,6 +520,18 @@ export default defineConfig({
         topographyGenerator: fileURLToPath(
           new URL(
             "./projects/topography-generator/index.html",
+            import.meta.url,
+          ),
+        ),
+        voronoiGenerator: fileURLToPath(
+          new URL(
+            "./projects/voronoi-generator/index.html",
+            import.meta.url,
+          ),
+        ),
+        animatedVoronoiField: fileURLToPath(
+          new URL(
+            "./projects/animated-voronoi-field/index.html",
             import.meta.url,
           ),
         ),

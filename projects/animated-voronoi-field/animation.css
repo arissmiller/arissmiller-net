@@ -1,0 +1,7 @@
+.seed-control { margin-top: 1rem; }
+.animated-stage { min-height: 32rem; }
+.status-light.is-paused { color: #8a6044; }
+.status-light.is-paused::before { background: #d7874e; box-shadow: 0 0 0 0.2rem rgba(215, 135, 78, 0.14); }
+.check-control { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; color: #395b54; font-size: 0.7rem; font-weight: 700; }
+.check-control input { width: 1.05rem; height: 1.05rem; accent-color: var(--accent); }
+@media (max-width: 540px) { .animated-stage { min-height: 21rem; } }

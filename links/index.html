@@ -19,6 +19,19 @@
         .window-body {
           grid-template-rows: minmax(0, 1fr) !important;
         }
+
+        .link-content {
+          display: block !important;
+        }
+
+        .link-index {
+          height: 100%;
+          overflow: auto;
+        }
+
+        .link-detail {
+          display: none !important;
+        }
       </style>
     </noscript>
   </head>
@@ -61,7 +74,6 @@
             id="link-panel"
             role="tabpanel"
             tabindex="0"
-            aria-live="polite"
             aria-labelledby="category-tab-all"
             data-link-panel
           >
@@ -70,13 +82,19 @@
               <p class="result-count" data-result-count>00 entries</p>
             </div>
 
-            <ol class="link-list" data-link-list>
-              <!-- LINKS_ITEMS -->
-            </ol>
+            <div class="link-content">
+              <div class="link-index">
+                <ol class="link-list" data-link-list>
+                  <!-- LINKS_ITEMS -->
+                </ol>
 
-            <div class="empty-state" data-empty-state hidden>
-              <h3>Nothing is filed here yet.</h3>
-              <p>Choose another category or add an entry to the catalog.</p>
+                <div class="empty-state" data-empty-state hidden>
+                  <h3>Nothing is filed here yet.</h3>
+                  <p>Choose another category or add an entry to the catalog.</p>
+                </div>
+              </div>
+
+              <!-- LINKS_DETAIL -->
             </div>
           </section>
         </div>
