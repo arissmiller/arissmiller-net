@@ -248,6 +248,40 @@
         object-fit: cover;
       }
 
+      .project-card-animated-topography-preview {
+        overflow: hidden;
+        background:
+          radial-gradient(ellipse at 66% 48%, rgba(68, 255, 195, 0.22), transparent 37%),
+          #020405;
+      }
+
+      .project-card-animated-topography-preview::before,
+      .project-card-animated-topography-preview::after {
+        content: "";
+        position: absolute;
+        inset: -15%;
+        border-radius: 43% 57% 49% 51% / 58% 42% 58% 42%;
+        border: 1px solid rgba(174, 255, 230, 0.72);
+        box-shadow:
+          0 0 0 12px rgba(125, 224, 193, 0.12),
+          0 0 0 24px rgba(125, 224, 193, 0.1),
+          0 0 0 36px rgba(125, 224, 193, 0.08),
+          0 0 1rem rgba(82, 255, 199, 0.55);
+        transform: translate(24%, 7%) rotate(-12deg) scale(0.72);
+        animation: topography-pulse 5s ease-in-out infinite alternate;
+      }
+
+      .project-card-animated-topography-preview::after {
+        inset: 8%;
+        opacity: 0.65;
+        transform: translate(-30%, 28%) rotate(18deg) scale(0.55);
+        animation-delay: -2.2s;
+      }
+
+      @keyframes topography-pulse {
+        to { border-radius: 55% 45% 57% 43% / 44% 61% 39% 56%; transform: translate(19%, 4%) rotate(-7deg) scale(0.8); }
+      }
+
       .project-card-circuit-preview {
         background-color: #07090d;
         background-image:
@@ -444,6 +478,29 @@
     <a class="projects-home-link" href="/">Home</a>
 
     <main class="project-board" aria-label="Project card layout mockup">
+      <a
+        class="project-card"
+        href="/projects/animated-topography-highlights/"
+      >
+        <div
+          class="project-card-media project-card-media-filled project-card-animated-topography-preview"
+          aria-hidden="true"
+        ></div>
+        <div class="project-card-body">
+          <h2 class="project-card-title">Animated Topography Highlights</h2>
+          <div class="project-card-labels">
+            <span class="project-card-label project-card-type-graphics">
+              Interactive Artwork
+            </span>
+            <span class="project-card-label project-card-warning">
+              JavaScript required
+            </span>
+          </div>
+          <p class="project-card-description">
+            Watch luminous contour bands climb across a continuously morphing Perlin-noise terrain.
+          </p>
+        </div>
+      </a>
       <a
         class="project-card"
         href="/projects/animated-voronoi-field/"

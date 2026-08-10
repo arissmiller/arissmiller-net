@@ -535,6 +535,12 @@ export default defineConfig({
             import.meta.url,
           ),
         ),
+        animatedTopographyHighlights: fileURLToPath(
+          new URL(
+            "./projects/animated-topography-highlights/index.html",
+            import.meta.url,
+          ),
+        ),
         photographs: fileURLToPath(
           new URL("./photographs/index.html", import.meta.url),
         ),

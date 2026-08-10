@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Glowing contour bands climb a continuously morphing Perlin-noise terrain." />
+    <title>Animated Topography Highlights — Armen Rissmiller</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="terrain-stage" data-stage>
+      <canvas data-canvas aria-label="Animated glowing topographic contour map"></canvas>
+
+      <header class="masthead">
+        <a class="back-link" href="/projects/">
+          <span aria-hidden="true">←</span> Projects
+        </a>
+        <div class="title-block">
+          <p class="kicker">Generative field study <span>№ 03</span></p>
+          <h1>Animated<br />topography<br />highlights</h1>
+        </div>
+      </header>
+
+      <div class="elevation-readout" aria-hidden="true">
+        <span class="readout-label">Elevation scan</span>
+        <strong data-elevation>000 m</strong>
+        <span class="readout-track"><i data-readout-progress></i></span>
+        <span class="readout-range"><i>low</i><i>high</i></span>
+      </div>
+
+      <fieldset class="palette-picker" aria-label="Color scheme">
+        <legend>Color field</legend>
+        <label title="Glacier">
+          <input type="radio" name="palette" value="glacier" checked />
+          <span style="--swatch: #aefee5">Glacier</span>
+        </label>
+        <label title="Ultraviolet">
+          <input type="radio" name="palette" value="ultraviolet" />
+          <span style="--swatch: #d8b4ff">Ultraviolet</span>
+        </label>
+        <label title="Ember">
+          <input type="radio" name="palette" value="ember" />
+          <span style="--swatch: #ffb06b">Ember</span>
+        </label>
+        <label title="Sonar">
+          <input type="radio" name="palette" value="sonar" />
+          <span style="--swatch: #71d9ff">Sonar</span>
+        </label>
+        <label title="Acid">
+          <input type="radio" name="palette" value="acid" />
+          <span style="--swatch: #d8ff63">Acid</span>
+        </label>
+      </fieldset>
+
+      <section class="controls" aria-label="Animation controls">
+        <div class="control-actions">
+          <button class="icon-button" type="button" data-toggle aria-label="Pause animation">
+            <span data-toggle-icon aria-hidden="true">Ⅱ</span>
+          </button>
+          <button class="text-button" type="button" data-randomize>New terrain</button>
+        </div>
+
+        <label class="control">
+          <span>Contours <output data-output="contours">18</output></span>
+          <input name="contours" type="range" min="9" max="28" step="1" value="18" />
+        </label>
+        <label class="control">
+          <span>Terrain scale <output data-output="scale">3.2×</output></span>
+          <input name="scale" type="range" min="1.8" max="6" step="0.1" value="3.2" />
+        </label>
+        <label class="control">
+          <span>Morph <output data-output="morph">0.16×</output></span>
+          <input name="morph" type="range" min="0" max="0.5" step="0.01" value="0.16" />
+        </label>
+        <label class="control">
+          <span>Climb <output data-output="climb">0.11×</output></span>
+          <input name="climb" type="range" min="0" max="0.3" step="0.01" value="0.11" />
+        </label>
+        <label class="control">
+          <span>Glow <output data-output="glow">72%</output></span>
+          <input name="glow" type="range" min="0" max="1" step="0.05" value="0.72" />
+        </label>
+      </section>
+
+      <footer class="field-note">
+        <span data-seed>Seed 4182</span>
+        <span>Layered Perlin noise / marching squares</span>
+      </footer>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
