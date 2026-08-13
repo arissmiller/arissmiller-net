@@ -1,15 +1,22 @@
-const imageModules = import.meta.glob(
+const paintSwirlModules = import.meta.glob(
   "../assets/images/paint-swirls/*.{png,jpg,jpeg,webp,avif,gif,PNG,JPG,JPEG,WEBP,AVIF,GIF}",
   { eager: true, import: "default" },
 );
 
+const outdoorModules = import.meta.glob(
+  "../assets/images/outdoors/*.{png,jpg,jpeg,webp,avif,gif,PNG,JPG,JPEG,WEBP,AVIF,GIF}",
+  { eager: true, import: "default" },
+);
+
 const dialog = document.querySelector("[data-gallery-window]");
-const openButton = document.querySelector("[data-open-paint-swirls]");
+const openButtons = [...document.querySelectorAll("[data-gallery]")];
 const closeButton = document.querySelector("[data-close-gallery]");
 const minimizeButton = document.querySelector("[data-minimize-gallery]");
 const maximizeButton = document.querySelector("[data-maximize-gallery]");
 const grid = document.querySelector("[data-gallery-grid]");
 const imageCount = document.querySelector("[data-image-count]");
+const galleryTitle = document.querySelector("[data-gallery-title]");
+const galleryPath = document.querySelector("[data-gallery-path]");
 const scrollUpButton = document.querySelector("[data-scroll-up]");
 const scrollDownButton = document.querySelector("[data-scroll-down]");
 const scrollTrack = document.querySelector("[data-scroll-track]");
@@ -21,6 +28,7 @@ let scrollMetrics = {
 };
 let dragStartY = 0;
 let dragStartScroll = 0;
+let activeOpenButton = null;
 
 const getFileName = (path) => path.split("/").pop() || path;
 
@@ -31,40 +39,69 @@ const getImageName = (fileName) =>
     .replaceAll("_", " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
 
-const images = Object.entries(imageModules)
-  .map(([path, src]) => {
-    const fileName = getFileName(path);
-    return { src, fileName, name: getImageName(fileName) };
-  })
-  .sort((a, b) =>
-    a.fileName.localeCompare(b.fileName, undefined, {
-      numeric: true,
-      sensitivity: "base",
+const createImageList = (modules) =>
+  Object.entries(modules)
+    .map(([path, src]) => {
+      const fileName = getFileName(path);
+      return { src, fileName, name: getImageName(fileName) };
     })
-  );
+    .sort((a, b) =>
+      a.fileName.localeCompare(b.fileName, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      })
+    );
 
-if (!dialog || !openButton || !grid) {
-  throw new Error("Paint Swirls gallery interface not found.");
+const galleries = {
+  "paint-swirls": {
+    title: "Paint Swirls",
+    path: "Paint_Swirls",
+    description: "paint swirl photograph",
+    images: createImageList(paintSwirlModules),
+  },
+  outdoors: {
+    title: "Outdoors",
+    path: "Outdoors",
+    description: "outdoor photograph",
+    images: createImageList(outdoorModules),
+  },
+};
+
+if (!dialog || openButtons.length === 0 || !grid) {
+  throw new Error("Photograph gallery interface not found.");
 }
 
-images.forEach((image) => {
-  const item = document.createElement("figure");
-  const photograph = document.createElement("img");
+const renderGallery = (gallery) => {
+  grid.replaceChildren();
+  grid.scrollTop = 0;
+  galleryTitle.textContent = `${gallery.title} / Visual Archive`;
+  galleryPath.textContent = `Archive / ${gallery.path}`;
+  grid.setAttribute("aria-label", `${gallery.title} photographs`);
+  imageCount.textContent = `${gallery.images.length} visual ${gallery.images.length === 1 ? "record" : "records"}`;
 
-  item.className = "gallery-item";
-  photograph.className = "gallery-image";
-  photograph.src = image.src;
-  photograph.alt = `${image.name} paint swirl photograph`;
-  photograph.loading = "lazy";
-  photograph.decoding = "async";
+  if (gallery.images.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "gallery-empty";
+    empty.textContent = "This folder is ready for photographs.";
+    grid.append(empty);
+    return;
+  }
 
-  item.append(photograph);
-  grid.append(item);
-});
+  gallery.images.forEach((image) => {
+    const item = document.createElement("figure");
+    const photograph = document.createElement("img");
 
-if (imageCount) {
-  imageCount.textContent = `${images.length} visual records`;
-}
+    item.className = "gallery-item";
+    photograph.className = "gallery-image";
+    photograph.src = image.src;
+    photograph.alt = `${image.name} ${gallery.description}`;
+    photograph.loading = "lazy";
+    photograph.decoding = "async";
+
+    item.append(photograph);
+    grid.append(item);
+  });
+};
 
 const updateScrollbar = () => {
   if (!scrollTrack || !scrollThumb) return;
@@ -101,7 +138,11 @@ const scrollByPageFraction = (direction) => {
   });
 };
 
-const openGallery = () => {
+const openGallery = (button) => {
+  const gallery = galleries[button.dataset.gallery];
+  if (!gallery) return;
+  activeOpenButton = button;
+  renderGallery(gallery);
   dialog.showModal();
   requestAnimationFrame(() => requestAnimationFrame(updateScrollbar));
 };
@@ -109,10 +150,12 @@ const openGallery = () => {
 const closeGallery = () => {
   dialog.classList.remove("is-maximized");
   dialog.close();
-  openButton.focus();
+  activeOpenButton?.focus();
 };
 
-openButton.addEventListener("click", openGallery);
+openButtons.forEach((button) => {
+  button.addEventListener("click", () => openGallery(button));
+});
 closeButton?.addEventListener("click", closeGallery);
 minimizeButton?.addEventListener("click", closeGallery);
 
@@ -120,7 +163,7 @@ maximizeButton?.addEventListener("click", () => {
   const isMaximized = dialog.classList.toggle("is-maximized");
   maximizeButton.setAttribute(
     "aria-label",
-    isMaximized ? "Restore Paint Swirls" : "Maximize Paint Swirls"
+    isMaximized ? "Restore gallery" : "Maximize gallery"
   );
   requestAnimationFrame(updateScrollbar);
 });

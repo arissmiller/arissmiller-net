@@ -29,8 +29,8 @@
       body {
         min-height: 100vh;
         overflow: hidden;
-        background-color: #87cbed;
-        background-image: url("/assets/images/photographs/rolling-hills-original.png");
+        background-color: #276693;
+        background-image: url("/assets/images/photographs/lake-tahoe-east-shore-background.webp");
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
@@ -449,7 +449,28 @@
         transform: scale(1.025);
       }
 
+      .gallery-empty {
+        grid-column: 1 / -1;
+        place-self: center;
+        margin: 0;
+        color: rgba(159, 224, 238, 0.62);
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
       @media (max-width: 640px) {
+        body {
+          background-position: 38% center;
+        }
+
         .gallery-window {
           width: calc(100vw - 1rem);
           height: calc(100vh - 1rem);
@@ -523,11 +544,21 @@
         <button
           class="desktop-folder"
           type="button"
-          data-open-paint-swirls
+          data-gallery="paint-swirls"
           aria-haspopup="dialog"
         >
           <span class="folder-icon" aria-hidden="true"></span>
           <span>Paint Swirls</span>
+        </button>
+
+        <button
+          class="desktop-folder"
+          type="button"
+          data-gallery="outdoors"
+          aria-haspopup="dialog"
+        >
+          <span class="folder-icon" aria-hidden="true"></span>
+          <span>Outdoors</span>
         </button>
       </div>
     </main>
@@ -535,14 +566,15 @@
     <dialog
       class="gallery-window"
       data-gallery-window
-      aria-labelledby="paint-swirl-window-title"
+      aria-labelledby="gallery-window-title"
     >
       <section class="gallery-window-shell">
         <header class="gallery-titlebar">
           <span class="gallery-status-light" aria-hidden="true"></span>
           <h1
             class="gallery-window-title"
-            id="paint-swirl-window-title"
+            id="gallery-window-title"
+            data-gallery-title
           >
             Paint Swirls / Visual Archive
           </h1>
@@ -551,7 +583,7 @@
               class="gallery-control"
               type="button"
               data-minimize-gallery
-              aria-label="Minimize Paint Swirls"
+              aria-label="Minimize gallery"
             >
               &minus;
             </button>
@@ -559,7 +591,7 @@
               class="gallery-control"
               type="button"
               data-maximize-gallery
-              aria-label="Maximize Paint Swirls"
+              aria-label="Maximize gallery"
             >
               □
             </button>
@@ -567,7 +599,7 @@
               class="gallery-control gallery-control-close"
               type="button"
               data-close-gallery
-              aria-label="Close Paint Swirls"
+              aria-label="Close gallery"
             >
               ×
             </button>
@@ -575,16 +607,16 @@
         </header>
 
         <div class="gallery-toolbar">
-          <span>Archive / Paint_Swirls</span>
+          <span data-gallery-path>Archive / Paint_Swirls</span>
           <span data-image-count>Loading visual records…</span>
         </div>
 
         <div class="gallery-viewport">
           <section
             class="gallery-grid"
-            id="paint-swirl-grid"
+            id="photograph-grid"
             data-gallery-grid
-            aria-label="Paint swirl photographs"
+            aria-label="Photographs"
             tabindex="0"
           ></section>
           <aside class="retro-scrollbar" aria-label="Gallery scrollbar">
@@ -599,7 +631,7 @@
                 class="retro-scroll-thumb"
                 data-scroll-thumb
                 role="scrollbar"
-                aria-controls="paint-swirl-grid"
+                aria-controls="photograph-grid"
                 aria-orientation="vertical"
                 aria-valuemin="0"
                 aria-valuemax="100"
