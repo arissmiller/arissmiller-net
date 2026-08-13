@@ -3,16 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
       content="Projects and visual experiments by Armen Rissmiller."
     />
     <title>Projects — Armen Rissmiller</title>
 
+    <script>
+      (() => {
+        const storedTheme = localStorage.getItem("projects-theme");
+        const systemTheme = matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+        document.documentElement.dataset.theme = storedTheme || systemTheme;
+      })();
+    </script>
+
     <style>
       :root {
         color-scheme: light;
-        background: #ffffff;
+        --page-background: #f8f5ea;
+        --page-grid: url("/assets/images/projects/isometric-paper-grid.svg");
+        background: var(--page-background);
+      }
+
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --page-background: #05090d;
+        --page-grid: url("/assets/images/projects/isometric-night-grid.svg");
       }
 
       * {
@@ -29,8 +48,8 @@
       body {
         min-height: 100vh;
         overflow: hidden;
-        background-color: #ffffff;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='92.37604307' viewBox='0 0 160 92.37604307'%3E%3Cdefs%3E%3Cpattern id='fine-grid' width='32' height='18.475208614' patternUnits='userSpaceOnUse'%3E%3Cpath d='M0 0V18.475208614M16 0V18.475208614M32 0V18.475208614M0 0L32 18.475208614M0 18.475208614L32 0' fill='none' stroke='%23d0e8f4' stroke-width='.75'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='160' height='92.37604307' fill='url(%23fine-grid)'/%3E%3Cpath d='M0 0V92.37604307M80 0V92.37604307M160 0V92.37604307M0 0L160 92.37604307M0 92.37604307L160 0' fill='none' stroke='%239dcde5' stroke-width='1'/%3E%3C/svg%3E");
+        background-color: var(--page-background);
+        background-image: var(--page-grid);
         background-position: 0 0;
         background-size: 160px 92.37604307px;
         background-repeat: repeat;
@@ -91,6 +110,45 @@
         letter-spacing: 0.1em;
         text-decoration: none;
         text-transform: uppercase;
+      }
+
+      .projects-theme-button {
+        position: fixed;
+        top: clamp(1rem, 2.5vw, 2.5rem);
+        right: clamp(1rem, 2.5vw, 2.5rem);
+        z-index: 2;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgba(76, 155, 194, 0.62);
+        border-radius: 999px;
+        color: #276b8c;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 0.4rem 1.2rem rgba(49, 111, 143, 0.1);
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Monaco,
+          Consolas,
+          "Liberation Mono",
+          monospace;
+        font-size: 0.65rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .projects-theme-button:hover,
+      .projects-theme-button:focus-visible {
+        color: #174f6b;
+        border-color: #4b9ac1;
+        background: #ffffff;
+      }
+
+      .projects-theme-button:focus-visible {
+        outline: 2px solid #4f9fc6;
+        outline-offset: 0.2rem;
       }
 
       .projects-home-link:hover,
@@ -476,6 +534,9 @@
     </svg>
 
     <a class="projects-home-link" href="/">Home</a>
+    <button class="projects-theme-button" type="button" data-theme-toggle>
+      Dark grid
+    </button>
 
     <main class="project-board" aria-label="Project card layout mockup">
       <a
@@ -735,6 +796,30 @@
     </main>
 
     <script>
+      (() => {
+        const toggle = document.querySelector("[data-theme-toggle]");
+        const root = document.documentElement;
+
+        const updateToggle = () => {
+          const isDark = root.dataset.theme === "dark";
+          toggle.textContent = isDark ? "Light grid" : "Dark grid";
+          toggle.setAttribute("aria-pressed", String(isDark));
+          toggle.setAttribute(
+            "aria-label",
+            `Use ${isDark ? "light" : "dark"} project grid`,
+          );
+        };
+
+        toggle.addEventListener("click", () => {
+          const theme = root.dataset.theme === "dark" ? "light" : "dark";
+          root.dataset.theme = theme;
+          localStorage.setItem("projects-theme", theme);
+          updateToggle();
+        });
+
+        updateToggle();
+      })();
+
       (() => {
         const svg = document.querySelector("[data-route-field]");
         const defs = svg.querySelector("[data-route-defs]");

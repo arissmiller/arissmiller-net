@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="92.37604307" viewBox="0 0 160 92.37604307">
+  <defs>
+    <pattern id="fine-grid" width="32" height="18.475208614" patternUnits="userSpaceOnUse">
+      <path d="M0 0V18.475208614M16 0V18.475208614M32 0V18.475208614M0 0L32 18.475208614M0 18.475208614L32 0" fill="none" stroke="#234453" stroke-width=".75" />
+    </pattern>
+  </defs>
+  <rect width="160" height="92.37604307" fill="#05090d" />
+  <rect width="160" height="92.37604307" fill="url(#fine-grid)" />
+  <path d="M0 0V92.37604307M80 0V92.37604307M160 0V92.37604307M0 0L160 92.37604307M0 92.37604307L160 0" fill="none" stroke="#397b98" stroke-width="1" />
+</svg>
