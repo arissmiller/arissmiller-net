@@ -50,6 +50,23 @@ function hexToRgba(hex, alpha) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
+function mixHex(first, second, amount) {
+  const parse = (hex) => {
+    const value = Number.parseInt(hex.replace("#", ""), 16);
+    return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+  };
+  const start = parse(first);
+  const end = parse(second);
+  const channels = start.map((value, index) =>
+    Math.round(value + (end[index] - value) * amount),
+  );
+  return `#${channels.map((value) => value.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function paletteFromAccent(accent) {
+  return [accent, mixHex(accent, "#ffffff", 0.18), mixHex(accent, "#000000", 0.2)];
+}
+
 function createTrace(random, width, height, grid, palette) {
   const edge = randomInteger(random, 0, 3);
   let x;
@@ -237,10 +254,15 @@ function drawBoard(
 }
 
 export function mountCircuitBackground(canvas, options = {}) {
-  if (!(canvas instanceof HTMLCanvasElement)) return () => {};
+  const emptyController = {
+    destroy() {},
+    setAccent() {},
+  };
+
+  if (!(canvas instanceof HTMLCanvasElement)) return emptyController;
 
   const context = canvas.getContext("2d", { alpha: false });
-  if (!context) return () => {};
+  if (!context) return emptyController;
 
   const numberOption = (name, fallback) => {
     const value = Number(options[name]);
@@ -248,7 +270,8 @@ export function mountCircuitBackground(canvas, options = {}) {
       ? value
       : fallback;
   };
-  const palette = options.palette ?? DEFAULT_PALETTE;
+  let palette = options.palette ??
+    (options.accent ? paletteFromAccent(options.accent) : DEFAULT_PALETTE);
   const seed = options.seed ?? "interesting-things";
   const background = options.background ?? "#07090d";
   const animationSpeed = Math.max(0.1, numberOption("animationSpeed", 1));
@@ -258,6 +281,7 @@ export function mountCircuitBackground(canvas, options = {}) {
   const staticLayer = document.createElement("canvas");
   const staticContext = staticLayer.getContext("2d", { alpha: false });
   let traces = [];
+  let chips = [];
   let pulses = [];
   let frame;
   let resizeTimer;
@@ -350,7 +374,7 @@ export function mountCircuitBackground(canvas, options = {}) {
     traces = Array.from({ length: traceCount }, () =>
       createTrace(random, width, height, grid, palette),
     );
-    const chips = Array.from({ length: chipCount }, () =>
+    chips = Array.from({ length: chipCount }, () =>
       createChip(random, width, height, grid, palette),
     );
     const requestedPulseCount = Math.max(
@@ -408,11 +432,34 @@ export function mountCircuitBackground(canvas, options = {}) {
   reducedMotion.addEventListener("change", handleMotionPreference);
   rebuild();
 
-  return () => {
-    stopAnimation();
-    window.clearTimeout(resizeTimer);
-    window.removeEventListener("resize", handleResize);
-    document.removeEventListener("visibilitychange", handleVisibility);
-    reducedMotion.removeEventListener("change", handleMotionPreference);
+  return {
+    destroy() {
+      stopAnimation();
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      reducedMotion.removeEventListener("change", handleMotionPreference);
+    },
+    setAccent(accent) {
+      palette = paletteFromAccent(accent);
+      traces.forEach((trace, index) => {
+        trace.color = palette[index % palette.length];
+      });
+      chips.forEach((chip, index) => {
+        chip.color = palette[(index + 1) % palette.length];
+      });
+      drawBoard(
+        staticContext,
+        width,
+        height,
+        traces,
+        chips,
+        Math.max(16, Math.min(64, numberOption("gridSize", width < 700 ? 24 : 30))),
+        background,
+        glow,
+      );
+      stopAnimation();
+      drawFrame(previousTime);
+    },
   };
 }

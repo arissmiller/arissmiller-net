@@ -3,7 +3,10 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { defineConfig } from "vite";
 import { marked } from "marked";
-import { categories as linkCategories } from "./links/catalog.js";
+import {
+  categories as linkCategories,
+  things as interestingThings,
+} from "./links/catalog.js";
 
 const NOTES_DIRECTORY = fileURLToPath(
   new URL("./notes/content/", import.meta.url),
@@ -232,117 +235,108 @@ function staticNotes() {
 }
 
 function renderLinkTabs() {
-  const categories = [
-    {
-      id: "all",
-      label: "All",
-      hue: "#f5f7ff",
-      links: linkCategories.flatMap((category) => category.links),
-    },
-    ...linkCategories,
-  ];
-
-  return categories
+  return linkCategories
     .map(
-      (category, index) => `
-        <div
-          class="category-tab-frame"
-          style="--category-hue: ${escapeAttribute(category.hue)}"
-        >
-          <button
-            class="category-tab"
-            id="category-tab-${escapeAttribute(category.id)}"
-            data-category-id="${escapeAttribute(category.id)}"
-            type="button"
-            role="tab"
-            aria-controls="link-panel"
-            aria-selected="${category.id === "all"}"
-            tabindex="${category.id === "all" ? "0" : "-1"}"
-          >
-            <span class="category-index">${String(index).padStart(2, "0")}</span>
-            <span class="category-label">${escapeAttribute(category.label)}</span>
-            <span class="category-total">
-              ${String(category.links.length).padStart(2, "0")} entries
-            </span>
-          </button>
-        </div>
+      (category) => `
+        <button
+          class="category-tab"
+          id="category-tab-${escapeAttribute(category.id)}"
+          data-category-id="${escapeAttribute(category.id)}"
+          data-category-hue="${escapeAttribute(category.hue)}"
+          type="button"
+          role="tab"
+          aria-controls="catalog-panel"
+          aria-selected="${category.id === "all"}"
+          tabindex="${category.id === "all" ? "0" : "-1"}"
+        >${escapeAttribute(category.label)}</button>
       `,
     )
     .join("");
 }
 
-function renderLinkItems() {
-  return linkCategories
-    .flatMap((category) =>
-      category.links.map((link) => {
-        const domain = new URL(link.url).hostname.replace(/^www\./, "");
-        const kind = link.kind === "personal" ? "personal" : "resource";
-        const kindLabel = kind === "personal" ? "Personal pick" : "Resource";
-        return `
-          <li
-            class="link-item"
-            data-category-id="${escapeAttribute(category.id)}"
-            style="--category-hue: ${escapeAttribute(category.hue)}"
-          >
-            <a
-              class="catalog-link"
-              href="${escapeAttribute(link.url)}"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div class="link-copy">
-                <h3 class="link-title">${escapeAttribute(link.title)}</h3>
-                <p class="link-description">${escapeAttribute(link.description)}</p>
-              </div>
-              <div class="link-meta">
-                <span class="link-tags">
-                  <span class="link-category">${escapeAttribute(category.label)}</span>
-                  <span class="link-kind link-kind-${kind}">${kindLabel}</span>
-                </span>
-                <span class="link-domain">${escapeAttribute(domain)}</span>
-              </div>
-              <span class="external-mark" aria-hidden="true">↗</span>
-            </a>
-          </li>
-        `;
-      }),
-    )
-    .join("");
+function createThingId(title) {
+  return `thing-${title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 }
 
-function renderLinkDetail() {
-  const category = linkCategories[0];
-  const link = category.links[0];
-  const domain = new URL(link.url).hostname.replace(/^www\./, "");
-  const kind = link.kind === "personal" ? "personal" : "resource";
-  const kindLabel = kind === "personal" ? "Personal pick" : "Resource";
-
-  return `
-    <aside
-      class="link-detail"
-      style="--detail-hue: ${escapeAttribute(category.hue)}"
-      data-link-detail
-      aria-live="polite"
-    >
-      <div class="detail-tags">
-        <span class="detail-category" data-detail-category>${escapeAttribute(category.label)}</span>
-        <span class="link-kind link-kind-${kind}" data-detail-kind>${kindLabel}</span>
+function renderInterestingThing(thing) {
+  const category = linkCategories.find(({ id }) => id === thing.category);
+  const role = thing.role ?? "resource";
+  const metadata = [category.label, role, thing.year].filter(Boolean);
+  const id = createThingId(thing.title);
+  const creator = thing.creator
+    ? `<p class="card-creator">${escapeAttribute(thing.creator)}</p>`
+    : "";
+  const image = thing.image
+    ? `
+      <div class="card-image-frame">
+        <img
+          class="card-image"
+          src="${escapeAttribute(thing.image)}"
+          alt="${escapeAttribute(thing.imageAlt ?? `${thing.title} artwork`)}"
+          loading="lazy"
+        />
       </div>
-      <div class="detail-copy">
-        <h3 data-detail-title>${escapeAttribute(link.title)}</h3>
-        <p data-detail-description>${escapeAttribute(link.description)}</p>
+    `
+    : `
+      <div class="card-image-frame card-image-placeholder" aria-hidden="true">
+        <span>IMAGE</span>
+        <small>// PENDING</small>
       </div>
-      <div class="detail-action">
-        <span data-detail-domain>${escapeAttribute(domain)}</span>
+    `;
+  const embed = thing.embedUrl
+    ? `
+      <div class="card-embed">
+        <iframe
+          src="${escapeAttribute(thing.embedUrl)}"
+          title="Embedded media for ${escapeAttribute(thing.title)}"
+          loading="lazy"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    `
+    : "";
+  const links = thing.links
+    .map(
+      (link) => `
         <a
+          class="card-action"
           href="${escapeAttribute(link.url)}"
           target="_blank"
           rel="noopener noreferrer"
-          data-detail-link
-        >Visit site <span aria-hidden="true">↗</span></a>
-      </div>
-    </aside>
+        >${escapeAttribute(link.label)} <span aria-hidden="true">↗</span></a>
+      `,
+    )
+    .join("");
+
+  return `
+    <li class="catalog-card catalog-card-has-image" data-category-id="${escapeAttribute(thing.category)}">
+      <article aria-labelledby="${id}">
+        ${image}
+        <div class="card-content">
+          <header class="card-header">
+            <div class="card-heading">
+              <h3 id="${id}">${escapeAttribute(thing.title)}</h3>
+              ${creator}
+            </div>
+            <p class="card-meta">
+              ${metadata.map((item) => `<span>${escapeAttribute(String(item))}</span>`).join("")}
+            </p>
+          </header>
+          <p class="card-description">${escapeAttribute(thing.description)}</p>
+          ${embed}
+          <footer class="card-actions">${links}</footer>
+        </div>
+      </article>
+    </li>
   `;
+}
+
+function renderLinkItems() {
+  return interestingThings.map(renderInterestingThing).join("");
 }
 
 function staticLinks() {
@@ -358,7 +352,10 @@ function staticLinks() {
         return html
           .replace("<!-- LINKS_TABS -->", renderLinkTabs())
           .replace("<!-- LINKS_ITEMS -->", renderLinkItems())
-          .replace("<!-- LINKS_DETAIL -->", renderLinkDetail());
+          .replace(
+            "<!-- LINKS_COUNT -->",
+            `${String(interestingThings.length).padStart(2, "0")} entries`,
+          );
       },
     },
   };

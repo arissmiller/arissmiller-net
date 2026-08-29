@@ -12,25 +12,12 @@
     <link rel="stylesheet" href="./links.css" />
     <noscript>
       <style>
-        .category-pane {
+        .category-nav {
           display: none !important;
         }
 
-        .window-body {
-          grid-template-rows: minmax(0, 1fr) !important;
-        }
-
-        .link-content {
-          display: block !important;
-        }
-
-        .link-index {
-          height: 100%;
-          overflow: auto;
-        }
-
-        .link-detail {
-          display: none !important;
+        .catalog-scroll {
+          overflow-y: auto !important;
         }
       </style>
     </noscript>
@@ -50,51 +37,44 @@
 
           <div class="window-identity">
             <h1>Interesting Things</h1>
+            <p>A small catalog of things I recommend. Not a 'greatest of all time' list.</p>
           </div>
         </header>
 
         <div class="window-body">
-          <section class="category-pane" aria-labelledby="category-heading">
-            <div class="pane-heading">
-              <h2 id="category-heading">Categories</h2>
-            </div>
-
+          <nav class="category-nav" aria-label="Catalog categories">
             <div
               class="category-tabs"
               role="tablist"
-              aria-label="Link categories"
+              aria-label="Catalog categories"
               data-category-tabs
             >
               <!-- LINKS_TABS -->
             </div>
-          </section>
+          </nav>
 
           <section
-            class="link-pane"
-            id="link-panel"
+            class="catalog-pane"
+            id="catalog-panel"
             role="tabpanel"
             tabindex="0"
             aria-labelledby="category-tab-all"
-            data-link-panel
+            data-catalog-panel
           >
-            <div class="link-toolbar">
-              <h2 data-active-label>Everything</h2>
-              <p class="result-count" data-result-count>00 entries</p>
-            </div>
+            <header class="catalog-status">
+              <p><span aria-hidden="true">&gt;</span> INDEX / <strong data-active-label>ALL</strong></p>
+              <p class="result-count" data-result-count><!-- LINKS_COUNT --></p>
+            </header>
 
-            <div class="link-content">
-              <div class="link-index">
-                <ol class="link-list" data-link-list>
-                  <!-- LINKS_ITEMS -->
-                </ol>
+            <div class="catalog-scroll" data-catalog-scroll>
+              <ol class="catalog-list" data-catalog-list>
+                <!-- LINKS_ITEMS -->
+              </ol>
 
-                <div class="empty-state" data-empty-state hidden>
-                  <h3>Nothing is filed here yet.</h3>
-                  <p>Choose another category or add an entry to the catalog.</p>
-                </div>
+              <div class="empty-state" data-empty-state hidden>
+                <h2>Nothing is filed here yet.</h2>
+                <p>Choose another category.</p>
               </div>
-
-              <!-- LINKS_DETAIL -->
             </div>
           </section>
         </div>
