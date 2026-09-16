@@ -1,0 +1,2 @@
+# Graphics Doodads
+I've made a few tools for creating procedurally generated graphics. I wanted to create a few designs, and give the user the ability to modify them and copy the resulting code for them to use themselves.
